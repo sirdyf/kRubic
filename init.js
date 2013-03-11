@@ -9,7 +9,7 @@ var container, stats;
 var camera, scene, renderer;
 
 var num = 0;
-var cub;
+
 var mouseX = 0, mouseY = 0;
 
 var windowHalfX = window.innerWidth / 2;
@@ -34,6 +34,7 @@ function init() {
 
     controlsMouse = new THREE.OrbitControls( camera );
     controlsMouse.addEventListener( 'change', render );
+    controls = new THREE.PointerLockControls(camera);
     
     scene.add( camera );
 
@@ -56,6 +57,7 @@ function init() {
 
     }
     var cub=new THREE.Mesh(new THREE.SphereGeometry(20, 20, 10));
+    scene.mainCube=cub;
     scene.add(cub);
     
     UTILS.createCrest(cub,3);
@@ -86,6 +88,7 @@ function animate() {
     requestAnimationFrame(animate);
     render();
     controlsMouse.update();
+    controls.update();
 
     document.getElementById( "val_right" ).innerHTML = controlsMouse._theta;
     }

@@ -24,6 +24,7 @@ THREE.PointerLockControls = function(camera) {
 
     var rotateYaw = new THREE.Vector3();
 
+    var velocityYaw = 0;
 
     var PI_2 = Math.PI / 2;
 
@@ -120,7 +121,12 @@ THREE.PointerLockControls = function(camera) {
     this.update = function(delta) {//delta is "delta time"
         if (scope.enabled === false)
             return;
-
+        if (rotateYawCW){
+            camera.targetCube.rotation.z+=0.01;
+        }
+        if (rotateYawСCW){
+            camera.targetCube.rotation.z-=0.01;
+        }
     };
 
 //document.getElementById( "val_right" ).innerHTML = vv;

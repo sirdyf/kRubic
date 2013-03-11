@@ -207,6 +207,7 @@ THREE.OrbitControls = function ( object, domElement ) {
                     
                     if (Math.abs(deltaAngleTheta)<Math.PI/180.0){
                         alignCube=false;
+                        this.object.targetCube = this.findFrontCube();
                         return;
                     }
 //                    if (deltaAngleTheta > 0){
@@ -216,7 +217,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 //                    }
                 }
 	};
-
+        this.findFrontCube = function (){
+            var obj=scene.mainCube.children[0];
+            var camPos=this.object.position.clone();
+            var dist = obj.position.clone().subSelf(camPos).length();
+            for (var index=1;index<scene.mainCube.children.length;index++) {
+                var deltaDir=scene.mainCube.children[index].position.clone().subSelf(camPos).length();
+                if (deltaDir<dist){
+                    dist=deltaDir;
+                    obj=scene.mainCube.children[index];
+                }
+            }
+            return obj;
+        };
 	function getAutoRotationAngle() {
 
 		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
