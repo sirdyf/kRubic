@@ -30,14 +30,18 @@ function init() {
     scene = new THREE.Scene();
     
     camera = new THREE.PerspectiveCamera(35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 500);
-    camera.position.z=-15;
+    camera.position.z=-25;
 
-    controls = new THREE.OrbitControls( camera );
-    controls.addEventListener( 'change', render );
+    controlsMouse = new THREE.OrbitControls( camera );
+    controlsMouse.addEventListener( 'change', render );
     
     scene.add( camera );
 
-    scene.add(new THREE.AmbientLight('rgb(15,15,20)'));
+    scene.add(new THREE.AmbientLight('rgb(20,150,20)'));
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1.15);
+    directionalLight.position.set(15, 50, 0);
+    camera.add(directionalLight);
 
     var maxAnisotropy = renderer.getMaxAnisotropy();
 
@@ -51,17 +55,11 @@ function init() {
         document.getElementById("val_right").innerHTML = "not supported";
 
     }
-    var mat = new THREE.MeshLambertMaterial({color: 0x11ffff});//, shading: THREE.FlatShading, overdraw: true});
-
-//THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-    cub = new THREE.Mesh(new THREE.CubeGeometry(5,5,5,3,3,3), mat);
-//    cub.position.z = -15;
-//    cub.position.x = 0;
-    
-    cub.updateMatrix();
-    cub.name = "cube";
+    var cub=new THREE.Mesh(new THREE.SphereGeometry(20, 20, 10));
     scene.add(cub);
-   
+    
+    UTILS.createCrest(cub,3);
+
     stats = new Stats();
     container.appendChild( stats.domElement );
     // RENDERER
@@ -77,7 +75,7 @@ function init() {
     container.appendChild(stats.domElement);
 
 //    controls = new THREE.PointerLockControls(camera);
-//    controls.enabled = true;
+//    controlsMouse.enabled = true;
 
     var width = window.innerWidth || 2;
     var height = window.innerHeight || 2;
@@ -87,10 +85,10 @@ function animate() {
 
     requestAnimationFrame(animate);
     render();
-    controls.update();
+    controlsMouse.update();
 
-
-}
+    document.getElementById( "val_right" ).innerHTML = controlsMouse._theta;
+    }
 
 //    document.getElementById( "val_right" ).innerHTML = vv;
 
@@ -107,7 +105,7 @@ function render() {
 //var onKeyDownMain = function(event) {
 //    if (event.keyCode === 32) { // Пробел
 //
-////        scene.fireLaser(controls.getObject());
+////        scene.fireLaser(controlsMouse.getObject());
 //
 //    }
 //};

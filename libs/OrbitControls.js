@@ -49,12 +49,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var phiDelta = 0;
 	var thetaDelta = 0;
 	var scale = 1;
-
 	var lastPosition = new THREE.Vector3();
 
 	var STATE = { NONE : -1, ROTATE : 0, ZOOM : 1 };
 	var state = STATE.NONE;
-
+        
+        var alignCube=false;
 	// events
 
 	var changeEvent = { type: 'change' };
@@ -135,13 +135,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().sub( this.center )
+		var offset = position.clone().subSelf( this.center )
 
 		// angle from z-axis around y-axis
 
 		var theta = Math.atan2( offset.x, offset.z );
 
-		// angle from y-axis
+                // angle from y-axis
 
 		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
 
@@ -153,6 +153,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		theta += thetaDelta;
 		phi += phiDelta;
+                this._theta += thetaDelta;
+                this._phi = phiDelta;
 
 		// restrict phi to be between desired limits
 		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
@@ -169,8 +171,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
 
-		position.copy( this.center ).add( offset );
-//		this.object.copy( this.center ).add( offset );
+		position.copy( this.center ).addSelf( offset );
+//		this.object.copy( this.center ).addSelf( offset );
 
 		this.object.lookAt( this.center );
 
@@ -185,9 +187,30 @@ THREE.OrbitControls = function ( object, domElement ) {
 			lastPosition.copy( this.object.position );
 
 		}
-
+                //---
+//                var delta=camera.position.clone();
+//                delta.y=0;
+//                delta.normalize();
+//                this._theta = Math.atan(delta.x/delta.z);
+//                var dirZ=new THREE.Vector3(0,0,-1);
+//                var sign = delta.x > 0 ? 1 : -1;
+//                this._theta = dirZ.angleTo(delta)*sign;
+//                if (delta.z>0 ){
+//                    this._theta = Math.PI-this._theta*sign;
+//                }
+//                if (alignCube === true){
+//                    deltaAngleTheta=camera.rotation.y / (Math.PI/3.0);
+//                    if (Math.abs(deltaAngleTheta)<Math.PI/360.0*5.0){
+//                        alignCube=false;
+//                        return;
+//                    }
+//                    if (deltaAngleTheta > 0){
+//                        this.rotateLeft(0.01);
+//                    }else{
+//                        this.rotateRight(0.01);
+//                    }
+//                }
 	};
-
 
 	function getAutoRotationAngle() {
 
@@ -223,7 +246,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
-
+                alignCube=false;//----
 	}
 
 	function onMouseMove( event ) {
@@ -233,7 +256,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( state === STATE.ROTATE ) {
 
 			rotateEnd.set( event.clientX, event.clientY );
-			rotateDelta.subVectors( rotateEnd, rotateStart );
+			rotateDelta.sub( rotateEnd, rotateStart );
 
 			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * scope.userRotateSpeed );
 			scope.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * scope.userRotateSpeed );
@@ -243,7 +266,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		} else if ( state === STATE.ZOOM ) {
 
 			zoomEnd.set( event.clientX, event.clientY );
-			zoomDelta.subVectors( zoomEnd, zoomStart );
+			zoomDelta.sub( zoomEnd, zoomStart );
 
 			if ( zoomDelta.y > 0 ) {
 
@@ -269,7 +292,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
 		state = STATE.NONE;
-
+                alignCube=true;//-----
 	}
 
 	function onMouseWheel( event ) {
