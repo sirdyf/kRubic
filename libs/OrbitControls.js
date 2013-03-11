@@ -30,6 +30,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
+        
+        //---------
+        this._theta=0;
 
 	// internals
 
@@ -198,18 +201,20 @@ THREE.OrbitControls = function ( object, domElement ) {
 //                if (delta.z>0 ){
 //                    this._theta = Math.PI-this._theta*sign;
 //                }
-//                if (alignCube === true){
-//                    deltaAngleTheta=camera.rotation.y / (Math.PI/3.0);
-//                    if (Math.abs(deltaAngleTheta)<Math.PI/360.0*5.0){
-//                        alignCube=false;
-//                        return;
-//                    }
+                if (alignCube === true){
+                    this._theta %= Math.PI;
+                    var deltaAngleTheta=(this._theta-Math.PI/6.0) % (Math.PI/2.0);
+                    
+                    if (Math.abs(deltaAngleTheta)<Math.PI/180.0){
+                        alignCube=false;
+                        return;
+                    }
 //                    if (deltaAngleTheta > 0){
-//                        this.rotateLeft(0.01);
+                        this.rotateLeft(0.01);
 //                    }else{
 //                        this.rotateRight(0.01);
 //                    }
-//                }
+                }
 	};
 
 	function getAutoRotationAngle() {
