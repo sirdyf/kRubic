@@ -27,9 +27,24 @@ UTILS.createCrest = function(base,scale){
 UTILS.rotateAroundWorldAxis = function(object, axis, radians) {
     var rotationMatrix = new THREE.Matrix4();
     rotationMatrix.makeRotationAxis( axis.normalize(), radians );
+    
     rotationMatrix.multiplySelf( object.matrix );                       // pre-multiply
     object.matrix = rotationMatrix;
     object.rotation.setEulerFromRotationMatrix( object.matrix );
+//    object.matrix.multiplySelf( rotationMatrix ); // post-multiply
+//    object.rotation.setEulerFromRotationMatrix(object.matrix);//, object.order);    
+};
+UTILS.findNearCube = function(base,children){
+    var l=base.position.distanceTo(children[0].position);
+    var o=children[0];
+    for(var i=0;i<children.length;i++){
+        var len=base.position.distanceTo(children[i].position);
+        if (len<l){
+            l=len;
+            o=children[i];
+        }
+    }
+    return o;
 };
 //UTILS.rotateAroundWorldAxis2 = function(object, axis, radians) {
 //    var rotationMatrix = new THREE.Matrix4();

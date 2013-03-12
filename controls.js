@@ -136,24 +136,25 @@ THREE.PointerLockControls = function(camera) {
     this.update = function(delta) {//delta is "delta time"
         if (scope.enabled === false)
             return;
-        if (rotateYawCW){
-            rotateYawCW=false;
+        if (rotateYawCW || rotateYawСCW){
             if (scene.mainCube.rotZ === 0){
                 scene.workObj = scene.mainCube.clone();
                 scene.altObj =  scene.mainCube.clone();
                 scene.workObj.stp=0;
-                scene.mainCube.rotZ=Math.PI/2.0;
+                scene.mainCube.rotZ=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
                 var cntr=scene.mainCube.position.clone();
                 cntr.z +=1;
-                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);
-            }
-        }
-        if (rotateYawСCW){
+                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+            rotateYawCW=false;
             rotateYawСCW=false;
-            if (scene.mainCube.rotZ === 0){
-                scene.mainCube.rotZ=-0.001;
             }
         }
+//        if (rotateYawСCW){
+//            rotateYawСCW=false;
+//            if (scene.mainCube.rotZ === 0){
+//                scene.mainCube.rotZ=-0.001;
+//            }
+//        }
         if (rotateYawForw){
             rotateYawForw=false;
             if (scene.mainCube.rotX === 0){
@@ -166,6 +167,20 @@ THREE.PointerLockControls = function(camera) {
                 scene.mainCube.rotX=-1;
             }
         }
+        if (moveRight){
+            if (scene.mainCube.rotFront === 0){
+                scene.targetObj = UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
+                scene.workObj = scene.mainCube.clone();
+                scene.altObj =  scene.mainCube.clone();
+                scene.workObj.stp=0;
+                scene.mainCube.rotFront=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+                var cntr=scene.mainCube.position.clone();
+                cntr.z +=1;
+                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+            }
+            
+            moveRight=false;
+        };
     };
 //document.getElementById( "val_right" ).innerHTML = vv;
 

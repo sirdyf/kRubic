@@ -67,6 +67,7 @@ function init() {
     scene.mainCube=cub;
     scene.mainCube.rotZ=0;
     scene.mainCube.rotX=0;
+    scene.mainCube.rotFront=0;
     scene.add(cub);
     
     UTILS.createCrest(cub,3);
@@ -117,7 +118,7 @@ function render() {
         var vvv=scene.altObj.rotation.clone();
         vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
         scene.mainCube.rotation.copy(vvv);
-        scene.workObj.stp += 0.001;
+        scene.workObj.stp += 0.1;
         if (scene.workObj.stp >1)  {
             scene.mainCube.rotZ=0;
             scene.mainCube.rotation.copy(scene.workObj.rotation);
@@ -128,6 +129,16 @@ function render() {
 //            UTILS.rotateAroundWorldAxis2(scene.mainCube,cntr,scene.mainCube.Math.PI/2);
 //            scene.mainCube.rotZ=0;
 //        }
+    }
+    if (scene.mainCube.rotFront !== 0){
+        var vvv=scene.altObj.rotation.clone();
+        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
+        scene.targetObj.rotation.copy(vvv);
+        scene.workObj.stp += 0.01;
+        if (scene.workObj.stp >1)  {
+            scene.mainCube.rotFront=0;
+            scene.targetObj.rotation.copy(scene.workObj.rotation);
+        }
     }
 //    var anglX= scene.mainCube.rotX<0 ? -vAnlSpeed : vAnlSpeed;
 //    if (scene.mainCube.rotX !== 0){
