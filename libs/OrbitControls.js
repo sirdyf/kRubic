@@ -33,6 +33,7 @@ THREE.OrbitControls = function ( object, domElement ) {
         
         //---------
         this._theta=0;
+        this._phi=0;
 
 	// internals
 
@@ -57,7 +58,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var STATE = { NONE : -1, ROTATE : 0, ZOOM : 1 };
 	var state = STATE.NONE;
         
-        var alignCube=false;
 	// events
 
 	var changeEvent = { type: 'change' };
@@ -154,10 +154,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
+                if (Math.abs(this._phi+phiDelta)<0.7){
 		theta += thetaDelta;
 		phi += phiDelta;
                 this._theta += thetaDelta;
-                this._phi = phiDelta;
+                this._phi += phiDelta;
+                }
 
 		// restrict phi to be between desired limits
 		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
@@ -190,45 +192,37 @@ THREE.OrbitControls = function ( object, domElement ) {
 			lastPosition.copy( this.object.position );
 
 		}
-                //---
-//                var delta=camera.position.clone();
-//                delta.y=0;
-//                delta.normalize();
-//                this._theta = Math.atan(delta.x/delta.z);
-//                var dirZ=new THREE.Vector3(0,0,-1);
-//                var sign = delta.x > 0 ? 1 : -1;
-//                this._theta = dirZ.angleTo(delta)*sign;
-//                if (delta.z>0 ){
-//                    this._theta = Math.PI-this._theta*sign;
-//                }
-                if (alignCube === true){
-                    this._theta %= Math.PI;
-                    var deltaAngleTheta=(this._theta-Math.PI/6.0) % (Math.PI/2.0);
-                    
-                    if (Math.abs(deltaAngleTheta)<Math.PI/180.0){
-                        alignCube=false;
-                        this.object.targetCube = this.findFrontCube();
-                        return;
+
+                
+                if (state === STATE.NONE){
+                    if (camera.targetCube){
+                    var targetPos=camera.targetCube.position.clone().subSelf(scene.mainCube.position);
+                    var camLen=camera.position.clone().subSelf(scene.mainCube.position).length();
+                    targetPos.normalize().multiplyScalar(camLen);
+                    scene.tmpCube.position.copy(targetPos);
+                    var vTar=camera.position.clone();
+                    vTar.y=targetPos.y;
+//                    vTar.subSelf(targetPos);
+                    var anglTar=vTar.angleTo(targetPos);
+                    if (anglTar>0.1){
+                        this.rotateLeft(0.05);
                     }
-//                    if (deltaAngleTheta > 0){
-                        this.rotateLeft(0.01);
-//                    }else{
-//                        this.rotateRight(0.01);
-//                    }
+                    }
                 }
-	};
-        this.findFrontCube = function (){
-            var obj=scene.mainCube.children[0];
-            var camPos=this.object.position.clone();
-            var dist = obj.position.clone().subSelf(camPos).length();
-            for (var index=1;index<scene.mainCube.children.length;index++) {
-                var deltaDir=scene.mainCube.children[index].position.clone().subSelf(camPos).length();
-                if (deltaDir<dist){
-                    dist=deltaDir;
-                    obj=scene.mainCube.children[index];
-                }
-            }
-            return obj;
+//                
+//                
+//        this.findFrontCube = function (){
+//            var obj=scene.mainCube.children[0];
+//            var camPos=this.object.position.clone();
+//            var dist = obj.position.clone().subSelf(camPos).length();
+//            for (var index=1;index<scene.mainCube.children.length;index++) {
+//                var deltaDir=scene.mainCube.children[index].position.clone().subSelf(camPos).length();
+//                if (deltaDir<dist){
+//                    dist=deltaDir;
+//                    obj=scene.mainCube.children[index];
+//                }
+//            }
+//            return obj;
         };
 	function getAutoRotationAngle() {
 
@@ -264,7 +258,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
-                alignCube=false;//----
+
 	}
 
 	function onMouseMove( event ) {
@@ -310,7 +304,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
 		state = STATE.NONE;
-                alignCube=true;//-----
+
 	}
 
 	function onMouseWheel( event ) {

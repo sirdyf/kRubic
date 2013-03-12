@@ -56,11 +56,15 @@ function init() {
         document.getElementById("val_right").innerHTML = "not supported";
 
     }
+    scene.tmpCube=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
+    scene.add(scene.tmpCube);
+    
     var cub=new THREE.Mesh(new THREE.SphereGeometry(20, 20, 10));
     scene.mainCube=cub;
     scene.add(cub);
     
     UTILS.createCrest(cub,3);
+    camera.targetCube=scene.mainCube.children[0];
 
     stats = new Stats();
     container.appendChild( stats.domElement );
@@ -90,7 +94,7 @@ function animate() {
     controlsMouse.update();
     controls.update();
 
-    document.getElementById( "val_right" ).innerHTML = controlsMouse._theta;
+    document.getElementById( "val_right" ).innerHTML = controlsMouse._phi;
     }
 
 //    document.getElementById( "val_right" ).innerHTML = vv;

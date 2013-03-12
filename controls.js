@@ -122,13 +122,28 @@ THREE.PointerLockControls = function(camera) {
         if (scope.enabled === false)
             return;
         if (rotateYawCW){
-            camera.targetCube.rotation.z+=0.01;
+//            camera.targetCube.rotation.z+=0.01;
         }
         if (rotateYawСCW){
-            camera.targetCube.rotation.z-=0.01;
+//            camera.targetCube.rotation.z-=0.01;
+        }
+        if (moveLeft){
+            moveLeft=false;
+            camera.targetCube = getLeft();
+//                scene.mainCube.rotation.y +=0.05;
         }
     };
-
+    this.getLeft = function(){
+            var obj=camera.targetCube;
+            for (var index=0;index<scene.mainCube.children.length;index++) {
+                if (scene.mainCube.children[index] !== obj){
+                    if (scene.mainCube.children[index].position.z === obj.position.z){
+                        
+                    }
+                }
+            }
+            return obj;        
+    };
 //document.getElementById( "val_right" ).innerHTML = vv;
 
 };
