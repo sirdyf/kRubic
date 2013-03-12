@@ -56,15 +56,18 @@ function init() {
         document.getElementById("val_right").innerHTML = "not supported";
 
     }
-    scene.tmpCube=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
-    scene.add(scene.tmpCube);
+    
+    scene.basePoint=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
+    scene.basePoint.position.copy(camera.position);
+    scene.add(scene.basePoint);
     
     var cub=new THREE.Mesh(new THREE.SphereGeometry(20, 20, 10));
     scene.mainCube=cub;
+    scene.mainCube.rotZ=0;
     scene.add(cub);
     
     UTILS.createCrest(cub,3);
-    camera.targetCube=scene.mainCube.children[0];
+//    camera.targetCube=scene.mainCube.children[0];
 
     stats = new Stats();
     container.appendChild( stats.domElement );
@@ -102,6 +105,15 @@ function animate() {
 function render() {
 
 //    var delta_time = clock.getDelta();
+//    var angle=scene.mainCube.rotZ;
+//    if (angle!==0){
+//        var matrixRot = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0,0,1),0.005);
+//        angle-=0.005;
+//        if (Math.abs(angle<0.01)) angle=0;
+////        matrixRot.multiplyVector3(scene.mainCube.rotation);
+//        scene.mainCube.applyMatrix(matrixRot);
+//        scene.mainCube.rotZ=angle;
+//    }
     renderer.render(scene, camera);
 
 //    time = Date.now();

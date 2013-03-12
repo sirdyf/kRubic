@@ -122,7 +122,8 @@ THREE.PointerLockControls = function(camera) {
         if (scope.enabled === false)
             return;
         if (rotateYawCW){
-//            camera.targetCube.rotation.z+=0.01;
+            rotateYawCW=false;
+            scene.mainCube.rotZ+=Math.PI/2;
         }
         if (rotateYawСCW){
 //            camera.targetCube.rotation.z-=0.01;

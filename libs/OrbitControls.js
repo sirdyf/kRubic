@@ -195,19 +195,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 
                 
                 if (state === STATE.NONE){
-                    if (camera.targetCube){
-                    var targetPos=camera.targetCube.position.clone().subSelf(scene.mainCube.position);
-                    var camLen=camera.position.clone().subSelf(scene.mainCube.position).length();
-                    targetPos.normalize().multiplyScalar(camLen);
-                    scene.tmpCube.position.copy(targetPos);
-                    var vTar=camera.position.clone();
-                    vTar.y=targetPos.y;
-//                    vTar.subSelf(targetPos);
-                    var anglTar=vTar.angleTo(targetPos);
-                    if (anglTar>0.1){
-                        this.rotateLeft(0.05);
-                    }
-                    }
+//                    if (camera.targetCube){
+//                    var targetPos=camera.targetCube.position.clone().subSelf(scene.mainCube.position);
+//                    var camLen=camera.position.clone().subSelf(scene.mainCube.position).length();
+//                    targetPos.normalize().multiplyScalar(camLen);
+//                    scene.tmpCube.position.copy(targetPos);
+//                    var vTar=camera.position.clone();
+//                    vTar.y=targetPos.y;
+////                    vTar.subSelf(targetPos);
+//                    var anglTar=vTar.angleTo(targetPos);
+//                    if (anglTar>0.1){
+//                        this.rotateLeft(0.05);
+//                    }
+//                    }
                 }
 //                
 //                
