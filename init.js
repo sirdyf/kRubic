@@ -61,9 +61,12 @@ function init() {
     scene.basePoint.position.copy(camera.position);
     scene.add(scene.basePoint);
     
-    var cub=new THREE.Mesh(new THREE.SphereGeometry(20, 20, 10));
+    scene.workObj=0;
+    
+    var cub=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
     scene.mainCube=cub;
     scene.mainCube.rotZ=0;
+    scene.mainCube.rotX=0;
     scene.add(cub);
     
     UTILS.createCrest(cub,3);
@@ -92,27 +95,47 @@ function init() {
 
 function animate() {
 
-    requestAnimationFrame(animate);
     render();
     controlsMouse.update();
     controls.update();
 
     document.getElementById( "val_right" ).innerHTML = controlsMouse._phi;
+    requestAnimationFrame(animate);
     }
 
 //    document.getElementById( "val_right" ).innerHTML = vv;
+// Rotate an object around an arbitrary axis in world space       
 
 function render() {
 
 //    var delta_time = clock.getDelta();
-//    var angle=scene.mainCube.rotZ;
-//    if (angle!==0){
-//        var matrixRot = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0,0,1),0.005);
-//        angle-=0.005;
-//        if (Math.abs(angle<0.01)) angle=0;
-////        matrixRot.multiplyVector3(scene.mainCube.rotation);
-//        scene.mainCube.applyMatrix(matrixRot);
-//        scene.mainCube.rotZ=angle;
+//    var vAnlSpeed=0.1;
+//    var anglZ= scene.mainCube.rotZ<0 ? -vAnlSpeed : vAnlSpeed;
+//    var cntr=scene.mainCube.position.clone();
+//    cntr.z +=1;
+    if (scene.mainCube.rotZ !== 0){
+        var vvv=scene.altObj.rotation.clone();
+        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
+        scene.mainCube.rotation.copy(vvv);
+        scene.workObj.stp += 0.001;
+        if (scene.workObj.stp >1)  {
+            scene.mainCube.rotZ=0;
+            scene.mainCube.rotation.copy(scene.workObj.rotation);
+        }
+//        UTILS.rotateAroundWorldAxis(scene.mainCube,cntr,scene.mainCube.rotZ);
+//        scene.mainCube.rotZ += anglZ;
+//        if (Math.abs(scene.mainCube.rotZ) > Math.PI/2) {
+//            UTILS.rotateAroundWorldAxis2(scene.mainCube,cntr,scene.mainCube.Math.PI/2);
+//            scene.mainCube.rotZ=0;
+//        }
+    }
+//    var anglX= scene.mainCube.rotX<0 ? -vAnlSpeed : vAnlSpeed;
+//    if (scene.mainCube.rotX !== 0){
+//        UTILS.rotateAroundWorldAxis(scene.mainCube,new THREE.Vector3(1,0,0),anglX);
+//        scene.mainCube.rotX += scene.mainCube.rotX > 0 ? 1 : -1;
+//        if (Math.abs(scene.mainCube.rotX) > (Math.PI/2)/vAnlSpeed+1) {
+//            scene.mainCube.rotX=0;
+//        }
 //    }
     renderer.render(scene, camera);
 

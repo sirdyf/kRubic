@@ -19,6 +19,8 @@ THREE.PointerLockControls = function(camera) {
     var moveRight = false;
     var rotateYawCW = false; // По часовой
     var rotateYawСCW = false; // Против часовой
+    var rotateYawForw = false;
+    var rotateYawBack = false;
 
     var velocity = new THREE.Vector3();
 
@@ -33,8 +35,10 @@ THREE.PointerLockControls = function(camera) {
         switch (event.keyCode) {
 
             case 38: // up
-            case 87: // w
                 moveForward = true;
+                break;
+            case 87: // w
+                rotateYawForw = true;
                 break;
 
             case 37: // left
@@ -46,8 +50,10 @@ THREE.PointerLockControls = function(camera) {
                 break;
 
             case 40: // down
-            case 83: // s
                 moveBackward = true;
+                break;
+            case 83: // s
+                rotateYawBack = true;
                 break;
 
             case 39: // right
@@ -75,11 +81,13 @@ THREE.PointerLockControls = function(camera) {
 
     var onKeyUp = function(event) {
 
-        switch (event.keyCode) {
+         switch (event.keyCode) {
 
             case 38: // up
-            case 87: // w
                 moveForward = false;
+                break;
+            case 87: // w
+                rotateYawForw = false;
                 break;
 
             case 37: // left
@@ -91,8 +99,10 @@ THREE.PointerLockControls = function(camera) {
                 break;
 
             case 40: // down
-            case 83: // a
                 moveBackward = false;
+                break;
+            case 83: // s
+                rotateYawBack = false;
                 break;
 
             case 39: // right
@@ -102,6 +112,11 @@ THREE.PointerLockControls = function(camera) {
             case 68: // d
                 rotateYawCW = false;
                 break;
+
+//			case 32: // space
+//				if ( canJump === true ) velocity.y += 10;
+//				canJump = false;
+//				break;
 
             case 81: // Q 
                 break;
@@ -123,27 +138,34 @@ THREE.PointerLockControls = function(camera) {
             return;
         if (rotateYawCW){
             rotateYawCW=false;
-            scene.mainCube.rotZ+=Math.PI/2;
+            if (scene.mainCube.rotZ === 0){
+                scene.workObj = scene.mainCube.clone();
+                scene.altObj =  scene.mainCube.clone();
+                scene.workObj.stp=0;
+                scene.mainCube.rotZ=Math.PI/2.0;
+                var cntr=scene.mainCube.position.clone();
+                cntr.z +=1;
+                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);
+            }
         }
         if (rotateYawСCW){
-//            camera.targetCube.rotation.z-=0.01;
-        }
-        if (moveLeft){
-            moveLeft=false;
-            camera.targetCube = getLeft();
-//                scene.mainCube.rotation.y +=0.05;
-        }
-    };
-    this.getLeft = function(){
-            var obj=camera.targetCube;
-            for (var index=0;index<scene.mainCube.children.length;index++) {
-                if (scene.mainCube.children[index] !== obj){
-                    if (scene.mainCube.children[index].position.z === obj.position.z){
-                        
-                    }
-                }
+            rotateYawСCW=false;
+            if (scene.mainCube.rotZ === 0){
+                scene.mainCube.rotZ=-0.001;
             }
-            return obj;        
+        }
+        if (rotateYawForw){
+            rotateYawForw=false;
+            if (scene.mainCube.rotX === 0){
+                scene.mainCube.rotX=1;
+            }
+        }
+        if (rotateYawBack){
+            rotateYawBack=false;
+            if (scene.mainCube.rotX === 0){
+                scene.mainCube.rotX=-1;
+            }
+        }
     };
 //document.getElementById( "val_right" ).innerHTML = vv;
 

@@ -24,3 +24,17 @@ UTILS.createCrest = function(base,scale){
     this.doubleBox(base,0,scale*1.1,0);
     this.doubleBox(base,0,0,scale*1.1);
 };
+UTILS.rotateAroundWorldAxis = function(object, axis, radians) {
+    var rotationMatrix = new THREE.Matrix4();
+    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
+    rotationMatrix.multiplySelf( object.matrix );                       // pre-multiply
+    object.matrix = rotationMatrix;
+    object.rotation.setEulerFromRotationMatrix( object.matrix );
+};
+//UTILS.rotateAroundWorldAxis2 = function(object, axis, radians) {
+//    var rotationMatrix = new THREE.Matrix4();
+//    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
+//    rotationMatrix.multiplySelf( object.matrix );                       // pre-multiply
+//    object.matrix = rotationMatrix;
+//    object.rotation.setEulerFromRotationMatrix( object.matrix );
+//};
