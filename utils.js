@@ -149,7 +149,7 @@ UTILS.findChildren = function(base,root){
         if (base !== root){
             var child=base.children[i];
 //            var vChild=base.children[i].position.clone();
-            child.position.subSelf(vBase);
+            child.position.addSelf(vBase);
             main.add(child);
             base.remove(base.children[i]);
         }

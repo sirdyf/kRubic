@@ -204,10 +204,10 @@ THREE.PointerLockControls = function(camera) {
             }
         }
   
-        if (moveRight){
+        if (moveRight || moveLeft){
             if (scene.mainCube.rot === 0){
-                var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
-                var nearObj=UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
+                var angl=Math.PI/2.0 * (moveLeft ? -1 : 1);
+                var nearObj=UTILS.findNearCube(scene.basePointFront,scene.mainCube.children);
                 
                 scene.tarObj=nearObj;
                 scene.altObj =  nearObj.clone();
@@ -215,17 +215,35 @@ THREE.PointerLockControls = function(camera) {
                 scene.cntr=new THREE.Vector3(0,0,1);
                 scene.cntr.addSelf(scene.mainCube.position);
                 scene.mainCube.worldToLocal(scene.cntr);
-                UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);// * (rotateYawСCW ? -1 : 1) );
+                UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);
                 UTILS.rebaseFront(scene.mainCube,nearObj);
                 this.normCubeAxis(scene.newObj);
-//                scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
                 scene.tarObj.rotAngle=angl;
                 scene.tarObj.step=0;
-                scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-//                scene.cntr=scene.mainCube.position.clone();
-//                scene.cntr.subSelf(scene.basePoint.position);
-//                scene.cntr.z +=1;    
+                scene.mainCube.rot=1;
                 moveRight=false;
+                moveLeft=false;
+            }
+        };
+        if (moveForward || moveBackward){
+            if (scene.mainCube.rot === 0){
+                var angl=Math.PI/2.0 * (moveBackward ? -1 : 1);
+                var nearObj=UTILS.findNearCube(scene.basePointRight,scene.mainCube.children);
+                
+                scene.tarObj=nearObj;
+                scene.altObj =  nearObj.clone();
+                scene.newObj =  nearObj.clone();
+                scene.cntr=new THREE.Vector3(1,0,0);
+                scene.cntr.addSelf(scene.mainCube.position);
+                scene.mainCube.worldToLocal(scene.cntr);
+                UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);
+                UTILS.rebaseFront(scene.mainCube,nearObj);
+                this.normCubeAxis(scene.newObj);
+                scene.tarObj.rotAngle=angl;
+                scene.tarObj.step=0;
+                scene.mainCube.rot=1;
+                moveForward=false;
+                moveBackward=false;
             }
         };
     };

@@ -57,9 +57,13 @@ function init() {
 
     }
     
-    scene.basePoint=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
-    scene.basePoint.position.copy(camera.position);
-    scene.add(scene.basePoint);
+    scene.basePointFront=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
+    scene.basePointFront.position=new THREE.Vector3(0,0,-15);
+    scene.add(scene.basePointFront);
+    
+    scene.basePointRight=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
+    scene.basePointRight.position=new THREE.Vector3(-15,0,0);
+    scene.add(scene.basePointRight);
     
     scene.workObj=0;
     
@@ -130,7 +134,7 @@ function render() {
             scene.tarObj.rotation.copy(scene.newObj.rotation);
 
 //            UTILS.updateChildrenMatrix(scene.tarObj);
-//            UTILS.normChildren(scene.mainCube);
+            UTILS.normChildren(scene.mainCube);
         }
     }
 //    if (scene.mainCube.rotFront !== 0){
