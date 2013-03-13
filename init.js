@@ -72,7 +72,7 @@ function init() {
     scene.tarObj=0;
     scene.add(cub);
     
-    UTILS.createCrest(cub,3);
+    UTILS.createCubik(cub,3);
 //    camera.targetCube=scene.mainCube.children[0];
 
     stats = new Stats();

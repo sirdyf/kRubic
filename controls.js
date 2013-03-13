@@ -203,17 +203,7 @@ THREE.PointerLockControls = function(camera) {
         }
   
         if (moveRight){
-//            if (scene.mainCube.rotFront === 0){
-//                scene.targetObj = UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
-//                scene.workObj = scene.mainCube.clone();
-//                scene.altObj =  scene.mainCube.clone();
-//                scene.workObj.stp=0;
-//                scene.mainCube.rotFront=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-//                var cntr=scene.mainCube.position.clone();
-//                cntr.z +=1;
-//                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
-//            }
-//            
+      
             moveRight=false;
         };
     };

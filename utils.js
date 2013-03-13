@@ -50,11 +50,33 @@ UTILS.doubleBox = function(base,vx,vy,vz){
     this.cloneBox(base,vx,vy,vz);
     this.cloneBox(base,-vx,-vy,-vz);
 };
-UTILS.createCrest = function(base,scale){
+UTILS.createPerimetr = function(tarCub,scale){
+    var v=tarCub.position.clone();
+    var sc=scale*1.1;
+    this.cloneBox(tarCub,sc,0,0);
+    this.cloneBox(tarCub,-sc,0,0);
+    this.cloneBox(tarCub,0,sc,0);
+    this.cloneBox(tarCub,0,-sc,0);
+    this.cloneBox(tarCub,sc,sc,0);
+    this.cloneBox(tarCub,sc,-sc,0);
+    this.cloneBox(tarCub,-sc,sc,0);
+    this.cloneBox(tarCub,-sc,-sc,0);
+};
+
+UTILS.createCubik = function(base,scale){
     this.cube=this.createBox(scale);
-    this.doubleBox(base,scale*1.1,0,0);
-    this.doubleBox(base,0,scale*1.1,0);
-    this.doubleBox(base,0,0,scale*1.1);
+    var sc=scale*1.1;
+    this.doubleBox(base,sc,0,0);
+    this.doubleBox(base,0,sc,0);
+    this.doubleBox(base,0,0,sc);
+
+    this.doubleBox(base,sc,sc,0);
+    this.doubleBox(base,-sc,sc,0);
+
+    this.createPerimetr(base.children[4],scale);
+    this.createPerimetr(base.children[5],scale);
+    
+    this.normChildren(base);
 };
 UTILS.rotateAroundWorldAxis = function(object, axis, radians) {
     var rotationMatrix = new THREE.Matrix4();
@@ -78,6 +100,28 @@ UTILS.findNearCube = function(base,children){
     }
     return o;
 };
+UTILS.normChildren = function(base){
+    var main=base;
+    for(var i in base.children){
+        this.findChildren(base.children[i],main);
+    }
+};
+UTILS.findChildren = function(base,root){
+    var main=root;
+    if (base.children.length===0) return;
+    var vBase=base.position.clone();
+    for(var i in base.children){
+        UTILS.findChildren(base.children[i],main);
+        if (base !== root){
+            var child=base.children[i].clone();
+//            var vChild=base.children[i].position.clone();
+            child.position.subSelf(vBase);
+            main.add(child);
+        }
+    };
+    base.children.length=0;
+};
+
 //UTILS.rotateAroundWorldAxis2 = function(object, axis, radians) {
 //    var rotationMatrix = new THREE.Matrix4();
 //    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
