@@ -203,8 +203,20 @@ THREE.PointerLockControls = function(camera) {
         }
   
         if (moveRight){
-      
-            moveRight=false;
+            if (scene.mainCube.rot === 0){
+                var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
+                var nearObj=UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
+                scene.altObj =  nearObj.clone();
+                scene.tarObj =  nearObj.clone();
+                scene.tarObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
+                this.normCubeAxis(scene.tarObj);
+                scene.tarObj.rotAngle=angl;
+                scene.tarObj.step=0;
+                scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+                scene.cntr=scene.mainCube.position.clone();
+                scene.cntr.z +=1;    
+                moveRight=false;
+            }
         };
     };
 //document.getElementById( "val_right" ).innerHTML = vv;
