@@ -170,10 +170,11 @@ THREE.PointerLockControls = function(camera) {
         if (rotateYawCW || rotateYawСCW){
             if (scene.mainCube.rot === 0){
                 var angl=Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+                scene.tarObj=scene.mainCube;
                 scene.altObj =  scene.mainCube.clone();
-                scene.tarObj =  scene.mainCube.clone();
-                scene.tarObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
-                this.normCubeAxis(scene.tarObj);
+                scene.newObj =  scene.mainCube.clone();
+                scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
+                this.normCubeAxis(scene.newObj);
                 scene.tarObj.rotAngle=angl;
                 scene.tarObj.step=0;
                 scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
@@ -187,10 +188,11 @@ THREE.PointerLockControls = function(camera) {
         if (rotateYawForw || rotateYawBack) {
             if (scene.mainCube.rot === 0){
                 var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
+                scene.tarObj=scene.mainCube;
                 scene.altObj =  scene.mainCube.clone();
-                scene.tarObj =  scene.mainCube.clone();
-                scene.tarObj.applyMatrix( new THREE.Matrix4().makeRotationX( angl) );
-                this.normCubeAxis(scene.tarObj);
+                scene.newObj =  scene.mainCube.clone();
+                scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationX( angl) );
+                this.normCubeAxis(scene.newObj);
                 scene.tarObj.rotAngle=angl;
                 scene.tarObj.step=0;
                 scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
@@ -206,15 +208,23 @@ THREE.PointerLockControls = function(camera) {
             if (scene.mainCube.rot === 0){
                 var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
                 var nearObj=UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
+                
+                scene.tarObj=nearObj;
                 scene.altObj =  nearObj.clone();
-                scene.tarObj =  nearObj.clone();
-                scene.tarObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
-                this.normCubeAxis(scene.tarObj);
+                scene.newObj =  nearObj.clone();
+                scene.cntr=new THREE.Vector3(0,0,1);
+                scene.cntr.addSelf(scene.mainCube.position);
+                scene.mainCube.worldToLocal(scene.cntr);
+                UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);// * (rotateYawСCW ? -1 : 1) );
+                UTILS.rebaseFront(scene.mainCube,nearObj);
+                this.normCubeAxis(scene.newObj);
+//                scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
                 scene.tarObj.rotAngle=angl;
                 scene.tarObj.step=0;
                 scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-                scene.cntr=scene.mainCube.position.clone();
-                scene.cntr.z +=1;    
+//                scene.cntr=scene.mainCube.position.clone();
+//                scene.cntr.subSelf(scene.basePoint.position);
+//                scene.cntr.z +=1;    
                 moveRight=false;
             }
         };

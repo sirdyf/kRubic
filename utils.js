@@ -4,6 +4,7 @@ UTILS.createBox = function(scale){
     var mat = new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true});
 //THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
     var cub = new THREE.Mesh(new THREE.CubeGeometry(scale,scale,scale,1,1,1), mat);
+    cub.matrixAutoUpdate = true;
 //    cub.updateMatrix();
 //    cub.name = "cube";
     return cub;
@@ -89,10 +90,15 @@ UTILS.rotateAroundWorldAxis = function(object, axis, radians) {
 //    object.rotation.setEulerFromRotationMatrix(object.matrix);//, object.order);    
 };
 UTILS.findNearCube = function(base,children){
-    var l=base.position.distanceTo(children[0].position);
+    // нужно вызывать после normChildren, чтобы небыло вложенностей 2 и более уровней
+    var vChild=children[0].position.clone();
+    var vPos=scene.mainCube.localToWorld(vChild);
+    var l=base.position.distanceTo(vPos);
     var o=children[0];
     for(var i=0;i<children.length;i++){
-        var len=base.position.distanceTo(children[i].position);
+        vChild=children[i].position.clone();
+        vChild=scene.mainCube.localToWorld(vChild);
+        var len=base.position.distanceTo(vChild);
         if (len<l){
             l=len;
             o=children[i];
@@ -100,26 +106,55 @@ UTILS.findNearCube = function(base,children){
     }
     return o;
 };
+UTILS.rebaseFront = function(base,target){
+    // нужно вызывать после normChildren, чтобы небыло вложенностей 2 и более уровней
+//    var deltaBase=scene.basePoint.position.clone().subSelf(base.position);
+    var vBase=scene.mainCube.localToWorld(target.position.clone());
+    for(var i=base.children.length-1; i>-1; i--){
+        if (target !== base.children[i]){
+            var vChild=scene.mainCube.localToWorld(base.children[i].position.clone());
+            var angl=vBase.dot(vChild);
+            if (angl>9.0){ //??????
+                var child=base.children[i];
+                child.position.subSelf(target.position);
+                target.add(child);
+            }
+        }
+    }
+};
+UTILS.updateChildrenMatrix = function(base){
+    base.updateMatrix();
+    base.updateMatrixWorld();
+    for(var i in base.children){
+//        base.children[i].updateMatrix();
+        base.children[i].updateMatrixWorld();
+    }
+    
+};
 UTILS.normChildren = function(base){
     var main=base;
     for(var i in base.children){
+        base.children[i].updateMatrix();
         this.findChildren(base.children[i],main);
     }
 };
+
+
 UTILS.findChildren = function(base,root){
     var main=root;
     if (base.children.length===0) return;
     var vBase=base.position.clone();
-    for(var i in base.children){
+    for(var i=base.children.length-1; i>-1; i--){
         UTILS.findChildren(base.children[i],main);
         if (base !== root){
-            var child=base.children[i].clone();
+            var child=base.children[i];
 //            var vChild=base.children[i].position.clone();
             child.position.subSelf(vBase);
             main.add(child);
+            base.remove(base.children[i]);
         }
     };
-    base.children.length=0;
+//    base.children.length=0;
 };
 
 //UTILS.rotateAroundWorldAxis2 = function(object, axis, radians) {

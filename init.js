@@ -67,7 +67,7 @@ function init() {
     scene.mainCube=cub;
     scene.mainCube.rot=0;
 
-    scene.mainCube.rotFront=0;
+    scene.newObj=0;
     scene.altObj=0;
     scene.tarObj=0;
     scene.add(cub);
@@ -102,7 +102,7 @@ function animate() {
     controlsMouse.update();
     controls.update();
 
-    document.getElementById( "val_right" ).innerHTML = controlsMouse._phi;
+    document.getElementById( "val_right" ).innerHTML = scene.mainCube.children.length;
     requestAnimationFrame(animate);
     }
 
@@ -123,16 +123,19 @@ function render() {
         var workObj=scene.altObj.clone();
         var angle=scene.tarObj.rotAngle*scene.tarObj.step;
         UTILS.rotateAroundWorldAxis(workObj,scene.cntr,angle);// * (rotateYawСCW ? -1 : 1) );
-        scene.mainCube.rotation.copy(workObj.rotation);
+        scene.tarObj.rotation.copy(workObj.rotation);
         scene.tarObj.step += 0.1;
         if (scene.tarObj.step >1)  {
             scene.mainCube.rot=0;
-            scene.mainCube.rotation.copy(scene.tarObj.rotation);
+            scene.tarObj.rotation.copy(scene.newObj.rotation);
+
+//            UTILS.updateChildrenMatrix(scene.tarObj);
+//            UTILS.normChildren(scene.mainCube);
         }
     }
-    if (scene.mainCube.rotFront !== 0){
-
-    }
+//    if (scene.mainCube.rotFront !== 0){
+//
+//    }
 //    var anglX= scene.mainCube.rotX<0 ? -vAnlSpeed : vAnlSpeed;
 //    if (scene.mainCube.rotX !== 0){
 //        UTILS.rotateAroundWorldAxis(scene.mainCube,new THREE.Vector3(1,0,0),anglX);
