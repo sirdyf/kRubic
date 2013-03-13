@@ -65,9 +65,11 @@ function init() {
     
     var cub=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
     scene.mainCube=cub;
-    scene.mainCube.rotZ=0;
-    scene.mainCube.rotX=0;
+    scene.mainCube.rot=0;
+
     scene.mainCube.rotFront=0;
+    scene.altObj=0;
+    scene.tarObj=0;
     scene.add(cub);
     
     UTILS.createCrest(cub,3);
@@ -114,31 +116,22 @@ function render() {
 //    var anglZ= scene.mainCube.rotZ<0 ? -vAnlSpeed : vAnlSpeed;
 //    var cntr=scene.mainCube.position.clone();
 //    cntr.z +=1;
-    if (scene.mainCube.rotZ !== 0){
-        var vvv=scene.altObj.rotation.clone();
-        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
-        scene.mainCube.rotation.copy(vvv);
-        scene.workObj.stp += 0.1;
-        if (scene.workObj.stp >1)  {
-            scene.mainCube.rotZ=0;
-            scene.mainCube.rotation.copy(scene.workObj.rotation);
+//        var vvv=scene.workObj.rotation.clone();
+//        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
+//        UTILS.aLerp(vvv,scene.workObj.rotation,scene.workObj.stp);
+    if (scene.mainCube.rot !== 0){
+        var workObj=scene.altObj.clone();
+        var angle=scene.tarObj.rotAngle*scene.tarObj.step;
+        UTILS.rotateAroundWorldAxis(workObj,scene.cntr,angle);// * (rotateYawСCW ? -1 : 1) );
+        scene.mainCube.rotation.copy(workObj.rotation);
+        scene.tarObj.step += 0.1;
+        if (scene.tarObj.step >1)  {
+            scene.mainCube.rot=0;
+            scene.mainCube.rotation.copy(scene.tarObj.rotation);
         }
-//        UTILS.rotateAroundWorldAxis(scene.mainCube,cntr,scene.mainCube.rotZ);
-//        scene.mainCube.rotZ += anglZ;
-//        if (Math.abs(scene.mainCube.rotZ) > Math.PI/2) {
-//            UTILS.rotateAroundWorldAxis2(scene.mainCube,cntr,scene.mainCube.Math.PI/2);
-//            scene.mainCube.rotZ=0;
-//        }
     }
     if (scene.mainCube.rotFront !== 0){
-        var vvv=scene.altObj.rotation.clone();
-        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
-        scene.targetObj.rotation.copy(vvv);
-        scene.workObj.stp += 0.01;
-        if (scene.workObj.stp >1)  {
-            scene.mainCube.rotFront=0;
-            scene.targetObj.rotation.copy(scene.workObj.rotation);
-        }
+
     }
 //    var anglX= scene.mainCube.rotX<0 ? -vAnlSpeed : vAnlSpeed;
 //    if (scene.mainCube.rotX !== 0){

@@ -132,53 +132,88 @@ THREE.PointerLockControls = function(camera) {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
 
+    this.normCubeAxis = function(obj){
+            this.normRotateAxis(obj.rotation.x);
+            this.normRotateAxis(obj.rotation.y);
+            this.normRotateAxis(obj.rotation.z);
+            obj.updateMatrix();
+    };
+    this.normRotateAxis = function(axis){
+            var oneGrad=Math.PI/180.0;
+            var piHalf = Math.PI/2.0;
+            var piPoltora = 1.5*Math.PI;
+            
+            var axisMod=Math.abs(axis);
+            
+            axis = axis % (2.0*Math.PI);
+            
+            if (axisMod<oneGrad){
+                axis=0;return;
+            }
+            if (Math.abs(axisMod-piHalf)<oneGrad){
+                axis=piHalf*(axis>0 ? 1 : -1);
+            }
+            if (Math.abs(axisMod-Math.PI)<oneGrad){
+                axis=Math.PI*(axis>0 ? 1 : -1);
+            }
+            if (Math.abs(axisMod-piPoltora)<oneGrad){
+                axis=piPoltora*(axis>0 ? 1 : -1);
+            }
+            if (Math.abs(axisMod-2.0*Math.PI)<oneGrad){
+                axis=0;
+            }
+    };
     
     this.update = function(delta) {//delta is "delta time"
         if (scope.enabled === false)
             return;
         if (rotateYawCW || rotateYawСCW){
-            if (scene.mainCube.rotZ === 0){
-                scene.workObj = scene.mainCube.clone();
+            if (scene.mainCube.rot === 0){
+                var angl=Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
                 scene.altObj =  scene.mainCube.clone();
-                scene.workObj.stp=0;
-                scene.mainCube.rotZ=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-                var cntr=scene.mainCube.position.clone();
-                cntr.z +=1;
-                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+                scene.tarObj =  scene.mainCube.clone();
+                scene.tarObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
+                this.normCubeAxis(scene.tarObj);
+                scene.tarObj.rotAngle=angl;
+                scene.tarObj.step=0;
+                scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+                scene.cntr=scene.mainCube.position.clone();
+                scene.cntr.z +=1;
+//                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
             rotateYawCW=false;
             rotateYawСCW=false;
             }
         }
-//        if (rotateYawСCW){
-//            rotateYawСCW=false;
-//            if (scene.mainCube.rotZ === 0){
-//                scene.mainCube.rotZ=-0.001;
-//            }
-//        }
-        if (rotateYawForw){
-            rotateYawForw=false;
-            if (scene.mainCube.rotX === 0){
-                scene.mainCube.rotX=1;
-            }
-        }
-        if (rotateYawBack){
-            rotateYawBack=false;
-            if (scene.mainCube.rotX === 0){
-                scene.mainCube.rotX=-1;
-            }
-        }
-        if (moveRight){
-            if (scene.mainCube.rotFront === 0){
-                scene.targetObj = UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
-                scene.workObj = scene.mainCube.clone();
+        if (rotateYawForw || rotateYawBack) {
+            if (scene.mainCube.rot === 0){
+                var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
                 scene.altObj =  scene.mainCube.clone();
-                scene.workObj.stp=0;
-                scene.mainCube.rotFront=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-                var cntr=scene.mainCube.position.clone();
-                cntr.z +=1;
-                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+                scene.tarObj =  scene.mainCube.clone();
+                scene.tarObj.applyMatrix( new THREE.Matrix4().makeRotationX( angl) );
+                this.normCubeAxis(scene.tarObj);
+                scene.tarObj.rotAngle=angl;
+                scene.tarObj.step=0;
+                scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+                scene.cntr=scene.mainCube.position.clone();
+                scene.cntr.x +=1;
+//                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+            rotateYawForw=false;
+            rotateYawBack=false;
             }
-            
+        }
+  
+        if (moveRight){
+//            if (scene.mainCube.rotFront === 0){
+//                scene.targetObj = UTILS.findNearCube(scene.basePoint,scene.mainCube.children);
+//                scene.workObj = scene.mainCube.clone();
+//                scene.altObj =  scene.mainCube.clone();
+//                scene.workObj.stp=0;
+//                scene.mainCube.rotFront=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+//                var cntr=scene.mainCube.position.clone();
+//                cntr.z +=1;
+//                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+//            }
+//            
             moveRight=false;
         };
     };

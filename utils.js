@@ -8,6 +8,38 @@ UTILS.createBox = function(scale){
 //    cub.name = "cube";
     return cub;
 };
+UTILS.sAdd = function(value,delta){
+    var x=delta,sum=value;
+    if (value>0){
+        sum+=x;
+    }else{
+        sum-=x;
+    }
+    return sum;
+};
+UTILS.aLerp = function(a,b,alpha){
+    a.x += ( b.x - a.x ) * alpha;
+    a.y += ( b.y - a.y ) * alpha;
+//    a.z += ( b.z - a.z ) * alpha;
+    a.z=UTILS.conv(a.z,b.z,alpha);
+};
+UTILS.conv = function(x,y,z){
+//        var one=Math.PI/180.0;
+//        if (Math.abs(y)<one) y=2*Math.PI-one;
+    if (x<0) {
+        x = Math.PI - x;
+    }
+    if (y<0) {
+        y = Math.PI - y;
+
+    }
+    x += (y - x) * z;
+    if (x>Math.PI) {
+        x = -(2* Math.PI - x);
+    }
+    return x;
+};
+
 UTILS.cloneBox = function(base,vx2,vy2,vz2){
     var cub2=this.cube.clone(); // || this.createBox(3);
     var vec=new THREE.Vector3(vx2,vy2,vz2);
