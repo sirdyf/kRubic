@@ -66,18 +66,32 @@ function init() {
     scene.add(scene.basePointRight);
     
     scene.workObj=0;
-    
-    var cub=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
-    scene.mainCube=cub;
-    scene.mainCube.rot=0;
-
     scene.newObj=0;
     scene.altObj=0;
     scene.tarObj=0;
-    scene.add(cub);
+    scene.mainCube=new THREE.Object3D();
+    scene.mainCube.rot=0;
     
-    UTILS.createCubik(cub,3);
+    
 //    camera.targetCube=scene.mainCube.children[0];
+    // model
+
+    var loader = new THREE.OBJMTLLoader();
+    loader.addEventListener( 'load', function ( event ) {
+
+            var object = event.content;
+
+//            object.position.y = - 80;
+//            scene.add( object );
+//        var cub=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
+        scene.mainCube=object.clone();
+        scene.add(scene.mainCube);       
+        UTILS.createCubik(scene.mainCube,3);
+        UTILS.normChildren(scene.mainCube);
+        UTILS.numericCube(scene.mainCube);
+
+    });
+    loader.load( 'model/props.obj', 'model/props.mtl' );
 
     stats = new Stats();
     container.appendChild( stats.domElement );
@@ -123,7 +137,7 @@ function render() {
 //        var vvv=scene.workObj.rotation.clone();
 //        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
 //        UTILS.aLerp(vvv,scene.workObj.rotation,scene.workObj.stp);
-    if (scene.mainCube.rot !== 0){
+    if ((scene.mainCube.rot)&&(scene.mainCube.rot !== 0)){
         var workObj=scene.altObj.clone();
         var angle=scene.tarObj.rotAngle*scene.tarObj.step;
         UTILS.rotateAroundWorldAxis(workObj,scene.cntr,angle);// * (rotateYawСCW ? -1 : 1) );

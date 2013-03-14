@@ -1,14 +1,25 @@
 var    UTILS = UTILS || { REVISION: '0.1' };
-
-UTILS.createBox = function(scale){
-    var mat = new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true});
-//THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-    var cub = new THREE.Mesh(new THREE.CubeGeometry(scale,scale,scale,1,1,1), mat);
-    cub.matrixAutoUpdate = true;
-//    cub.updateMatrix();
-//    cub.name = "cube";
-    return cub;
+UTILS.numericCube = function(base){
+    for (var i in base.children){
+        var obj=base.children[i];
+        var pos=obj.position.clone();
+        obj.x = this.getIndexValue(pos.x);
+        obj.y = this.getIndexValue(pos.y);
+        obj.z = this.getIndexValue(pos.z);
+        obj.cubIndex = obj.z+1 + (obj.y+1) * 3 + (obj.x+1) * 9;
+        console.log(obj.z,obj.y,obj.x,obj.cubIndex);
+    }
 };
+
+//UTILS.createBox = function(scale,model){
+////    var mat = new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true});
+////THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+//    var cub = model.clone();//new THREE.Mesh(new THREE.CubeGeometry(scale,scale,scale,1,1,1), mat);
+//    cub.matrixAutoUpdate = true;
+////    cub.updateMatrix();
+////    cub.name = "cube";
+//    return cub;
+//};
 UTILS.sAdd = function(value,delta){
     var x=delta,sum=value;
     if (value>0){
@@ -40,11 +51,18 @@ UTILS.conv = function(x,y,z){
     }
     return x;
 };
+UTILS.getIndexValue = function(value){
+    var val=value;
+    if (val > 0) val = 1;
+    if (val < 0) val =-1;
+    return val;
+};
 
 UTILS.cloneBox = function(base,vx2,vy2,vz2){
-    var cub2=this.cube.clone(); // || this.createBox(3);
+    var cub2=this.orignCube.clone(); // || this.createBox(3);
     var vec=new THREE.Vector3(vx2,vy2,vz2);
     cub2.position.copy(vec);
+//    console.log(cub2.x,cub2.y,cub2.z);
     base.add(cub2);
 };
 UTILS.doubleBox = function(base,vx,vy,vz){
@@ -65,7 +83,8 @@ UTILS.createPerimetr = function(tarCub,scale){
 };
 
 UTILS.createCubik = function(base,scale){
-    this.cube=this.createBox(scale);
+    this.orignCube=base.clone();//this.createBox(scale,base);
+    this.orignCube.name="cub";
     var sc=scale*1.1;
     this.doubleBox(base,sc,0,0);
     this.doubleBox(base,0,sc,0);
@@ -74,8 +93,8 @@ UTILS.createCubik = function(base,scale){
     this.doubleBox(base,sc,sc,0);
     this.doubleBox(base,-sc,sc,0);
 
-    this.createPerimetr(base.children[4],scale);
-    this.createPerimetr(base.children[5],scale);
+//    this.createPerimetr(base.children[4],scale);
+//    this.createPerimetr(base.children[5],scale);
     
     this.normChildren(base);
 };
@@ -89,7 +108,7 @@ UTILS.rotateAroundWorldAxis = function(object, axis, radians) {
 //    object.matrix.multiplySelf( rotationMatrix ); // post-multiply
 //    object.rotation.setEulerFromRotationMatrix(object.matrix);//, object.order);    
 };
-UTILS.findNearCube = function(base,children){
+UTILS.findNearCube = function(base,children){// !!!!!!!!!!
     // нужно вызывать после normChildren, чтобы небыло вложенностей 2 и более уровней
     var vChild=children[0].position.clone();
     var vPos=scene.mainCube.localToWorld(vChild);
@@ -151,7 +170,7 @@ UTILS.findChildren = function(base,root){
 //            var vChild=base.children[i].position.clone();
             child.position.addSelf(vBase);
             main.add(child);
-            base.remove(base.children[i]);
+//            base.remove(base.children[i]);
         }
     };
 //    base.children.length=0;
