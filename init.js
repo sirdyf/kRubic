@@ -30,7 +30,7 @@ function init() {
     scene = new THREE.Scene();
     
     camera = new THREE.PerspectiveCamera(35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 500);
-    camera.position.z=-25;
+    camera.position.z=-10;
 
     controlsMouse = new THREE.OrbitControls( camera );
     controlsMouse.addEventListener( 'change', render );
@@ -41,7 +41,7 @@ function init() {
     scene.add(new THREE.AmbientLight('rgb(20,150,20)'));
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 1.15);
-    directionalLight.position.set(15, 50, 0);
+    directionalLight.position.set(1, 5, 1);
     camera.add(directionalLight);
 
     var maxAnisotropy = renderer.getMaxAnisotropy();
@@ -85,8 +85,10 @@ function init() {
 //            scene.add( object );
 //        var cub=new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
         scene.mainCube=object.clone();
+        scene.mainCube.defaultChildren=object.children.length;
         scene.add(scene.mainCube);       
-        UTILS.createCubik(scene.mainCube,3);
+        scene.mainCube.rot=0;
+        UTILS.createCubik(scene.mainCube,1);
         UTILS.normChildren(scene.mainCube);
         UTILS.numericCube(scene.mainCube);
 
@@ -120,9 +122,9 @@ function animate() {
     controlsMouse.update();
     controls.update();
 
-    document.getElementById( "val_right" ).innerHTML = scene.mainCube.children.length;
+    document.getElementById( "val_right" ).innerHTML = scene.mainCube.children.length-scene.mainCube.defaultChildren;
     requestAnimationFrame(animate);
-    }
+}
 
 //    document.getElementById( "val_right" ).innerHTML = vv;
 // Rotate an object around an arbitrary axis in world space       

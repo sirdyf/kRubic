@@ -188,7 +188,7 @@ THREE.PointerLockControls = function(camera) {
         if (rotateYawForw || rotateYawBack) {
             if (scene.mainCube.rot === 0){
                 var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
-                scene.tarObj=scene.mainCube;
+                scene.tarObj = scene.mainCube;
                 scene.altObj =  scene.mainCube.clone();
                 scene.newObj =  scene.mainCube.clone();
                 scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationX( angl) );
