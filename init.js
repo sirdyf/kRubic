@@ -147,9 +147,12 @@ function render() {
         scene.tarObj.step += 0.1;
         if (scene.tarObj.step >1)  {
             scene.mainCube.rot=0;
-            scene.tarObj.rotation.copy(scene.newObj.rotation);
+//            scene.tarObj.position.copy(scene.newObj.position);
+//            scene.tarObj.rotation.copy(scene.newObj.rotation);
 
 //            UTILS.updateChildrenMatrix(scene.tarObj);
+
+
             UTILS.normChildren(scene.mainCube);
         }
     }

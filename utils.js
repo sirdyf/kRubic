@@ -151,14 +151,31 @@ UTILS.rebaseFront = function(base,target){
     // нужно вызывать после normChildren, чтобы небыло вложенностей 2 и более уровней
 //    var deltaBase=scene.basePoint.position.clone().subSelf(base.position);
     var vBase=scene.mainCube.localToWorld(target.position.clone());
+//    var mBaseRot=new THREE.Matrix4().extractRotation(scene.mainCube.matrix);//.setRotationFromEuler(base.rotation);
     for(var i=base.children.length-1; i>-1; i--){
         if (target !== base.children[i]){
             if (base.children[i].name === "cub"){
                 var vChild=scene.mainCube.localToWorld(base.children[i].position.clone());
                 var angl=vBase.dot(vChild);
-                if (angl>9.0){ //??????
+                if (angl>0.9){ //??????
                     var child=base.children[i];
-                    child.position.subSelf(target.position);
+//                    child.position.subSelf(target.position);
+                    
+                    
+//                    child.rotation.copy(target.rotation);
+//                var mChildRot=new THREE.Matrix4().extractRotation(child.matrix);//.setRotationFromEuler(child.rotation);
+//                var mRes=mChildRot.multiplySelf(mBaseRot);
+//                child.rotation.setEulerFromRotationMatrix( mRes );
+                    target.updateMatrix();//World();
+                    var matrixInverse = new THREE.Matrix4();
+                    matrixInverse.getInverse( target.matrix );
+                    
+                    child.updateMatrix();
+                    child.applyMatrix( matrixInverse);
+//		child.applyMatrix( base.matrix );
+//		base.remove( child );
+//		scene.add( child );
+                    base.remove(child);
                     target.add(child);
                 }
             }
@@ -177,32 +194,50 @@ UTILS.updateChildrenMatrix = function(base){
     
 };
 UTILS.normChildren = function(base){
-    var main=base;
+//    var main=base;
     for(var i in base.children){
         if (base.children[i].name === "cub"){
             base.children[i].updateMatrix();
-            this.findChildren(base.children[i],main);
+            this.findChildren(base.children[i]);//,main);
         }
     }
 };
 
 
-UTILS.findChildren = function(base,root){
-    var main=root;
+UTILS.findChildren = function(base){//,root){
+    var main=base.parent;
     if (base.children.length===0) return;
-    var vBase=base.position.clone();
+    var vBasePos=base.position.clone();
+//    var mBaseRot=new THREE.Matrix4().extractRotation(base.matrix);//.setRotationFromEuler(base.rotation);
     for(var i=base.children.length-1; i>-1; i--){
-        UTILS.findChildren(base.children[i],main);
-        if (base !== root){
+        UTILS.findChildren(base.children[i]);//,main);
+//        if (base !== root){
             var child=base.children[i];
 //            var vChild=base.children[i].position.clone();
             if (base.children[i].name === "cub"){
 
-                child.position.addSelf(vBase);
-                main.add(child);
-    //            base.remove(base.children[i]);
+//                child.position.addSelf(vBasePos);
+                
+//                var mChildRot=new THREE.Matrix4().extractRotation(child.matrix);//.setRotationFromEuler(child.rotation);
+//                var mRes=mChildRot.multiplySelf(mBaseRot);
+//                child.rotation.setEulerFromRotationMatrix( mRes );
+                if (main){
+                    
+                    main.updateMatrix();//World();
+                    var matrixInverse = new THREE.Matrix4();
+                    matrixInverse.getInverse( base.matrix );
+                    
+                    child.updateMatrix();
+                    child.updateMatrixWorld();
+                    child.applyMatrix( base.matrix );
+                    child.updateMatrix();
+                    child.updateMatrixWorld();
+ 
+//                    base.remove(child);
+                    main.add(child);
+                }
             }
-        }
+//        }
     };
 //    base.children.length=0;
 };

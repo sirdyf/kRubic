@@ -217,7 +217,7 @@ THREE.PointerLockControls = function(camera) {
                 scene.mainCube.worldToLocal(scene.cntr);
                 UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);
                 UTILS.rebaseFront(scene.mainCube,nearObj);
-                this.normCubeAxis(scene.newObj);
+//                this.normCubeAxis(scene.newObj);
                 scene.tarObj.rotAngle=angl;
                 scene.tarObj.step=0;
                 scene.mainCube.rot=1;
@@ -238,7 +238,7 @@ THREE.PointerLockControls = function(camera) {
                 scene.mainCube.worldToLocal(scene.cntr);
                 UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);
                 UTILS.rebaseFront(scene.mainCube,nearObj);
-                this.normCubeAxis(scene.newObj);
+//                this.normCubeAxis(scene.newObj);
                 scene.tarObj.rotAngle=angl;
                 scene.tarObj.step=0;
                 scene.mainCube.rot=1;
