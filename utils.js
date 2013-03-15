@@ -20,6 +20,24 @@ UTILS.numericCube = function(base){
 ////    cub.name = "cube";
 //    return cub;
 //};
+UTILS.vRotationInNull = function(v,step){
+    v.x = this.sSub(v.x,step);
+    v.y = this.sSub(v.y,step);
+    v.z = this.sSub(v.z,step);
+};
+UTILS.sSub = function(value,delta){
+    var x=Math.abs(delta),sum=value;
+    if (value>0){
+        sum -= x;
+    }else{
+        sum += x;
+    }
+    if (Math.abs(sum)<=delta){
+        sum = 0;
+    }
+    return sum;
+};
+
 UTILS.sAdd = function(value,delta){
     var x=delta,sum=value;
     if (value>0){

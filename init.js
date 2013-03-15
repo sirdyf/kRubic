@@ -30,7 +30,7 @@ function init() {
     scene = new THREE.Scene();
     
     camera = new THREE.PerspectiveCamera(35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 500);
-    camera.position.z=-10;
+    camera.position.z=-15;
 
     controlsMouse = new THREE.OrbitControls( camera );
     controlsMouse.addEventListener( 'change', render );
@@ -71,7 +71,8 @@ function init() {
     scene.tarObj=0;
     scene.mainCube=new THREE.Object3D();
     scene.mainCube.rot=0;
-    
+    scene.specialMode =0;
+    scene.specialVariable=0;
     
 //    camera.targetCube=scene.mainCube.children[0];
     // model
@@ -139,34 +140,58 @@ function render() {
 //        var vvv=scene.workObj.rotation.clone();
 //        vvv.lerpSelf(scene.workObj.rotation,scene.workObj.stp);
 //        UTILS.aLerp(vvv,scene.workObj.rotation,scene.workObj.stp);
-    if ((scene.mainCube.rot)&&(scene.mainCube.rot !== 0)){
-        var workObj=scene.altObj.clone();
-        var angle=scene.tarObj.rotAngle*scene.tarObj.step;
-        UTILS.rotateAroundWorldAxis(workObj,scene.cntr,angle);// * (rotateYawСCW ? -1 : 1) );
-        scene.tarObj.rotation.copy(workObj.rotation);
-        scene.tarObj.step += 0.1;
-        if (scene.tarObj.step >1)  {
-            scene.mainCube.rot=0;
-//            scene.tarObj.position.copy(scene.newObj.position);
-//            scene.tarObj.rotation.copy(scene.newObj.rotation);
-
-//            UTILS.updateChildrenMatrix(scene.tarObj);
-
-
-            UTILS.normChildren(scene.mainCube);
+    if (scene.specialMode !== 0){
+        var vsPos=scene.mainCube.position.clone();
+        var bEnd=false;
+        for(var i in scene.mainCube.children){
+            if (scene.mainCube.children[i].name !== "cub") continue;
+            if (scene.specialMode === 1){
+                var sRad=-0.005;
+                var vsDelta = new THREE.Vector3(0,0,0);
+                scene.mainCube.children[i].worldToLocal(vsDelta);
+                if (scene.mainCube.children[i].position.distanceTo(vsPos)<2.0){
+                    scene.mainCube.children[i].translate(sRad,vsDelta);
+                    bEnd=true;
+                }
+            }
+            if (scene.specialMode === 2){
+                var vRotChild = scene.mainCube.children[i].rotation;
+                var lenRotChild = vRotChild.lengthSq();
+                if (lenRotChild>0){
+                    UTILS.vRotationInNull(vRotChild,0.01);
+                    bEnd=true;
+                }
+            }
+            if (scene.specialMode === 3){
+                var sRad=0.005;
+                var vsDelta = new THREE.Vector3(0,0,0);
+                scene.mainCube.children[i].worldToLocal(vsDelta);
+                if (scene.mainCube.children[i].position.distanceTo(vsPos)>1.0){
+                    scene.mainCube.children[i].translate(sRad,vsDelta);
+                    bEnd=true;
+                }
+            }
+        }
+        if (bEnd === false){
+            scene.specialMode += 1;
+            if (scene.specialMode===4) {
+                scene.specialMode=0;
+            }
+        }
+    }else{
+        if ((scene.mainCube.rot)&&(scene.mainCube.rot !== 0)){
+            var workObj=scene.altObj.clone();
+            var angle=scene.tarObj.rotAngle*scene.tarObj.step;
+            UTILS.rotateAroundWorldAxis(workObj,scene.cntr,angle);// * (rotateYawСCW ? -1 : 1) );
+            scene.tarObj.rotation.copy(workObj.rotation);
+            scene.tarObj.step += 0.1;
+            if (scene.tarObj.step >1)  {
+                scene.mainCube.rot=0;
+                UTILS.normChildren(scene.mainCube);
+            }
         }
     }
-//    if (scene.mainCube.rotFront !== 0){
-//
-//    }
-//    var anglX= scene.mainCube.rotX<0 ? -vAnlSpeed : vAnlSpeed;
-//    if (scene.mainCube.rotX !== 0){
-//        UTILS.rotateAroundWorldAxis(scene.mainCube,new THREE.Vector3(1,0,0),anglX);
-//        scene.mainCube.rotX += scene.mainCube.rotX > 0 ? 1 : -1;
-//        if (Math.abs(scene.mainCube.rotX) > (Math.PI/2)/vAnlSpeed+1) {
-//            scene.mainCube.rotX=0;
-//        }
-//    }
+
     renderer.render(scene, camera);
 
 //    time = Date.now();
@@ -174,15 +199,18 @@ function render() {
   }
 
 
-//var onKeyDownMain = function(event) {
-//    if (event.keyCode === 32) { // Пробел
-//
-////        scene.fireLaser(controlsMouse.getObject());
-//
-//    }
-//};
+var onKeyDownMain = function(event) {
+    if (event.keyCode === 32) { // Пробел
+        if (scene.specialMode === 0) {
+            scene.specialMode = 1;
+            scene.specialVariable=0;
+        }
+//        scene.fireLaser(controlsMouse.getObject());
 
-//document.addEventListener( 'keydown', onKeyDownMain, false );
+    }
+};
+
+document.addEventListener( 'keydown', onKeyDownMain, false );
 
 function onWindowResize() {
         
