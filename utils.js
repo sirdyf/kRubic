@@ -259,6 +259,12 @@ UTILS.findChildren = function(base){//,root){
     };
 //    base.children.length=0;
 };
+//UTILS.saveCubicToTemp = function(base){
+//    this.tmpCube = base.clone();
+//    for (var i in base.children){
+//        this.tmpCube
+//    }
+//};
 
 //UTILS.rotateAroundWorldAxis2 = function(object, axis, radians) {
 //    var rotationMatrix = new THREE.Matrix4();

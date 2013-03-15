@@ -149,7 +149,7 @@ function render() {
                 var sRad=-0.005;
                 var vsDelta = new THREE.Vector3(0,0,0);
                 scene.mainCube.children[i].worldToLocal(vsDelta);
-                if (scene.mainCube.children[i].position.distanceTo(vsPos)<2.0){
+                if (scene.mainCube.children[i].position.lengthSq()<4.0){//distanceTo(vsPos)<2.0){
                     scene.mainCube.children[i].translate(sRad,vsDelta);
                     bEnd=true;
                 }
@@ -166,7 +166,8 @@ function render() {
                 var sRad=0.005;
                 var vsDelta = new THREE.Vector3(0,0,0);
                 scene.mainCube.children[i].worldToLocal(vsDelta);
-                if (scene.mainCube.children[i].position.distanceTo(vsPos)>1.0){
+//                if (scene.mainCube.children[i].position.distanceTo(vsPos)>scene.tmpObj.children[i].position.distanceTo(vsPos)){
+                if (scene.mainCube.children[i].position.lengthSq()>scene.tmpObj.children[i].position.lengthSq()){
                     scene.mainCube.children[i].translate(sRad,vsDelta);
                     bEnd=true;
                 }
@@ -176,6 +177,8 @@ function render() {
             scene.specialMode += 1;
             if (scene.specialMode===4) {
                 scene.specialMode=0;
+                scene.tmpObj=0;
+                //NORMALIZE CUBE!!
             }
         }
     }else{
@@ -204,6 +207,7 @@ var onKeyDownMain = function(event) {
         if (scene.specialMode === 0) {
             scene.specialMode = 1;
             scene.specialVariable=0;
+            scene.tmpObj = scene.mainCube.clone();
         }
 //        scene.fireLaser(controlsMouse.getObject());
 
