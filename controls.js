@@ -5,13 +5,6 @@
 THREE.PointerLockControls = function(camera) {
 
     var scope = this;
-
-//    var yawObject = new THREE.Object3D();
-//    yawObject.position.y = 3;
-//    yawObject.add(camera);
-
-    
-
     var enableContols = true;
     var moveForward = false;
     var moveBackward = false;
@@ -27,8 +20,6 @@ THREE.PointerLockControls = function(camera) {
     var rotateYaw = new THREE.Vector3();
 
     var velocityYaw = 0;
-
-    var PI_2 = Math.PI / 2;
 
     var onKeyDown = function(event) {
 
@@ -132,119 +123,29 @@ THREE.PointerLockControls = function(camera) {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
 
-    this.normCubeAxis = function(obj){
-            this.normRotateAxis(obj.rotation.x);
-            this.normRotateAxis(obj.rotation.y);
-            this.normRotateAxis(obj.rotation.z);
-            obj.updateMatrix();
-    };
-    this.normRotateAxis = function(axis){
-            var oneGrad=Math.PI/180.0;
-            var piHalf = Math.PI/2.0;
-            var piPoltora = 1.5*Math.PI;
-            
-            var axisMod=Math.abs(axis);
-            
-            axis = axis % (2.0*Math.PI);
-            
-            if (axisMod<oneGrad){
-                axis=0;return;
-            }
-            if (Math.abs(axisMod-piHalf)<oneGrad){
-                axis=piHalf*(axis>0 ? 1 : -1);
-            }
-            if (Math.abs(axisMod-Math.PI)<oneGrad){
-                axis=Math.PI*(axis>0 ? 1 : -1);
-            }
-            if (Math.abs(axisMod-piPoltora)<oneGrad){
-                axis=piPoltora*(axis>0 ? 1 : -1);
-            }
-            if (Math.abs(axisMod-2.0*Math.PI)<oneGrad){
-                axis=0;
-            }
-    };
-    
     this.update = function(delta) {//delta is "delta time"
         if (scope.enabled === false)
             return;
         if (rotateYawCW || rotateYawСCW){
-            if (scene.mainCube.rot === 0){
-                var angl=Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-                scene.tarObj=scene.mainCube;
-                scene.altObj =  scene.mainCube.clone();
-                scene.newObj =  scene.mainCube.clone();
-                scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationZ( angl) );
-                this.normCubeAxis(scene.newObj);
-                scene.tarObj.rotAngle=angl;
-                scene.tarObj.step=0;
-                scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-                scene.cntr=scene.mainCube.position.clone();
-                scene.cntr.z +=1;
-//                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+            scene.main.pressRotateLR(rotateYawCW ? 1 : -1);
             rotateYawCW=false;
             rotateYawСCW=false;
-            }
         }
         if (rotateYawForw || rotateYawBack) {
-            if (scene.mainCube.rot === 0){
-                var angl=Math.PI/2.0 * (rotateYawBack ? -1 : 1);
-                scene.tarObj = scene.mainCube;
-                scene.altObj =  scene.mainCube.clone();
-                scene.newObj =  scene.mainCube.clone();
-                scene.newObj.applyMatrix( new THREE.Matrix4().makeRotationX( angl) );
-                this.normCubeAxis(scene.newObj);
-                scene.tarObj.rotAngle=angl;
-                scene.tarObj.step=0;
-                scene.mainCube.rot=1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
-                scene.cntr=scene.mainCube.position.clone();
-                scene.cntr.x +=1;
-//                UTILS.rotateAroundWorldAxis(scene.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );
+            scene.main.pressRotateFB(rotateYawForw ? 1 : -1);
             rotateYawForw=false;
             rotateYawBack=false;
-            }
         }
   
         if (moveRight || moveLeft){
-            if (scene.mainCube.rot === 0){
-                var angl=Math.PI/2.0 * (moveLeft ? -1 : 1);
-                var nearObj=UTILS.findNearCube(scene.basePointFront,scene.mainCube.children);
-                
-                scene.tarObj=nearObj;
-                scene.altObj =  nearObj.clone();
-                scene.newObj =  nearObj.clone();
-                scene.cntr=new THREE.Vector3(0,0,1);
-                scene.cntr.addSelf(scene.mainCube.position);
-                scene.mainCube.worldToLocal(scene.cntr);
-                UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);
-                UTILS.rebaseFront(scene.mainCube,nearObj);
-//                this.normCubeAxis(scene.newObj);
-                scene.tarObj.rotAngle=angl;
-                scene.tarObj.step=0;
-                scene.mainCube.rot=1;
-                moveRight=false;
-                moveLeft=false;
-            }
+            scene.main.pressMoveLR(moveRight ? 1 : -1);
+            moveRight=false;
+            moveLeft=false;
         };
         if (moveForward || moveBackward){
-            if (scene.mainCube.rot === 0){
-                var angl=Math.PI/2.0 * (moveBackward ? -1 : 1);
-                var nearObj=UTILS.findNearCube(scene.basePointRight,scene.mainCube.children);
-                
-                scene.tarObj=nearObj;
-                scene.altObj =  nearObj.clone();
-                scene.newObj =  nearObj.clone();
-                scene.cntr=new THREE.Vector3(1,0,0);
-                scene.cntr.addSelf(scene.mainCube.position);
-                scene.mainCube.worldToLocal(scene.cntr);
-                UTILS.rotateAroundWorldAxis(scene.newObj,scene.cntr,angl);
-                UTILS.rebaseFront(scene.mainCube,nearObj);
-//                this.normCubeAxis(scene.newObj);
-                scene.tarObj.rotAngle=angl;
-                scene.tarObj.step=0;
-                scene.mainCube.rot=1;
+            scene.main.pressMoveFB(moveForward ? 1 : -1);
                 moveForward=false;
                 moveBackward=false;
-            }
         };
     };
 //document.getElementById( "val_right" ).innerHTML = vv;
