@@ -13,9 +13,13 @@ CUBIC.init = function() {
     var cntr = 0;
     var mainCube = new THREE.Object3D();
     var basePointFront = new THREE.Vector3(0, 0, -15);
+    var basePointBack = new THREE.Vector3(0, 0, 15);
     var basePointRight = new THREE.Vector3(-15, 0, 0);
+    var basePointLeft = new THREE.Vector3(15, 0, 0);
+    var basePointDown = new THREE.Vector3(0, -15, 0);
+    var basePointUp = new THREE.Vector3(0, 15, 0);
     // U = d,up,a
-    var script1 = ["test"];//,"U2","D2","F2","B2","L2","R2"];
+    var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//"U2","D2","F2","B2","L2","R2"];
 
     mainCube.rot = 0;
     var demo = [];
@@ -110,8 +114,23 @@ CUBIC.init = function() {
         }
     };
     this.processCode = function(c){
-        if (c === "test"){
-            this.pressRotateLR(1);
+        if (c === "U"){
+            this.pressMoveUp(-1);
+        }
+        if (c === "D"){
+            this.pressMoveDown(1);
+        }
+        if (c === "F"){
+            this.pressMoveFront(1);
+        }
+        if (c === "B"){
+            this.pressMoveBack(-1);
+        }
+        if (c === "R"){
+            this.pressMoveRight(1);
+        }
+        if (c === "L"){
+            this.pressMoveLeft(-1);
         }
     };
     
@@ -205,13 +224,29 @@ CUBIC.init = function() {
         UTILS.rebaseFront(mainCube, nearObj);
     };
     
-    this.pressMoveLR = function(flag) {
+    this.pressMoveFront = function(flag) {
             cntr = new THREE.Vector3(0, 0, 1);
             this.move(basePointFront,flag);
     };
-    this.pressMoveFB = function(flag) {
+    this.pressMoveBack = function(flag) {
+            cntr = new THREE.Vector3(0, 0, 1);
+            this.move(basePointBack,flag);
+    };
+    this.pressMoveRight = function(flag) {
             cntr = new THREE.Vector3(1, 0, 0);
             this.move(basePointRight,flag);
+    };
+    this.pressMoveLeft = function(flag) {
+            cntr = new THREE.Vector3(1, 0, 0);
+            this.move(basePointLeft,flag);
+    };
+    this.pressMoveUp = function(flag) {
+            cntr = new THREE.Vector3(0, 1, 0);
+            this.move(basePointUp,flag);
+    };
+    this.pressMoveDown = function(flag) {
+            cntr = new THREE.Vector3(0, 1, 0);
+            this.move(basePointDown,flag);
     };
 };
 //                UTILS.rotateAroundWorldAxis(main.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );      
