@@ -14,6 +14,7 @@ THREE.PointerLockControls = function(camera) {
     var rotateYawСCW = false; // Против часовой
     var rotateYawForw = false;
     var rotateYawBack = false;
+    var space = false;
 
     var velocity = new THREE.Vector3();
 
@@ -55,10 +56,9 @@ THREE.PointerLockControls = function(camera) {
                 rotateYawCW = true;
                 break;
 
-//			case 32: // space
-//				if ( canJump === true ) velocity.y += 10;
-//				canJump = false;
-//				break;
+            case 32: // space
+                space = true;
+                    break;
 
             case 81: // Q 
                 break;
@@ -104,10 +104,9 @@ THREE.PointerLockControls = function(camera) {
                 rotateYawCW = false;
                 break;
 
-//			case 32: // space
-//				if ( canJump === true ) velocity.y += 10;
-//				canJump = false;
-//				break;
+            case 32: // space
+                space = false;
+		break;
 
             case 81: // Q 
                 break;
@@ -147,6 +146,10 @@ THREE.PointerLockControls = function(camera) {
                 moveForward=false;
                 moveBackward=false;
         };
+        if (space){
+            scene.main.pressSpace();
+            space = false;
+        }
     };
 //document.getElementById( "val_right" ).innerHTML = vv;
 
