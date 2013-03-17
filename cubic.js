@@ -1,4 +1,4 @@
-/* 
+  /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -15,10 +15,10 @@ CUBIC.init = function() {
     var basePointFront = new THREE.Vector3(0, 0, -15);
     var basePointRight = new THREE.Vector3(-15, 0, 0);
     // U = d,up,a
-    var script1 = ["U2","D2","F2","B2","L2","R2"];
+    var script1 = ["test"];//,"U2","D2","F2","B2","L2","R2"];
 
     mainCube.rot = 0;
-    var demo = 0;
+    var demo = [];
     demo.value =0 ;
 
     this.getMainObj = function() {
@@ -38,13 +38,13 @@ CUBIC.init = function() {
         UTILS.numericCube(mainCube);
     };
 
-    normCubeAxis = function(obj) {
-        normRotateAxis(obj.rotation.x);
-        normRotateAxis(obj.rotation.y);
-        normRotateAxis(obj.rotation.z);
+    this.normCubeAxis = function(obj) {
+        this.normRotateAxis(obj.rotation.x);
+        this.normRotateAxis(obj.rotation.y);
+        this.normRotateAxis(obj.rotation.z);
         obj.updateMatrix();
     };
-    normRotateAxis = function(axis) {
+    this.normRotateAxis = function(axis) {
         var oneGrad = Math.PI / 180.0;
         var piHalf = Math.PI / 2.0;
         var piPoltora = 1.5 * Math.PI;
@@ -72,7 +72,7 @@ CUBIC.init = function() {
     };
     this.render = function() {
         if (demo.value === 0){
-                if (mainCube.rot !== 0) {
+            if (mainCube.rot !== 0) {
                 var workObj = altObj.clone();
                 var angle = tarObj.rotAngle * tarObj.step;
                 UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
@@ -84,11 +84,38 @@ CUBIC.init = function() {
                 }
             }
         }else{
-            
+                if (mainCube.rot !== 0) {
+                    var workObj = altObj.clone();
+                    var angle = tarObj.rotAngle * tarObj.step;
+                    UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
+                    tarObj.rotation.copy(workObj.rotation);
+                    tarObj.step += 0.1;
+                    if (tarObj.step > 1) {
+                        mainCube.rot = 0;
+                        UTILS.normChildren(mainCube);
+                    }
+                }else{
+                    this.nextStep();
+                }
         }
     };
-
-    render2 = function() {
+    this.nextStep = function(){
+        if (demo.value > script1.length){
+            demo.value=0;
+            mainCube.rot=0;
+        }else{
+            var code=script1[demo.value-1];
+            this.processCode(code);
+            demo.value+=1;
+        }
+    };
+    this.processCode = function(c){
+        if (c === "test"){
+            this.pressRotateLR(1);
+        }
+    };
+    
+    this.render2 = function() {
         if (specialMode !== 0) {
             var vsPos = mainCube.position.clone();
             var bEnd = false;
@@ -136,11 +163,11 @@ CUBIC.init = function() {
     };
     this.pressSpace = function(){
         if (demo.value === 0) {
-            demo.value =1;
+            demo.value = 1;
         }
     };
     
-    rotate = function(flag){
+    this.rotate = function(flag){
         var angl = Math.PI / 2.0 * (flag <0 ? -1 : 1);
         tarObj = mainCube;
         altObj = mainCube.clone();
@@ -151,25 +178,25 @@ CUBIC.init = function() {
         cntr = mainCube.position.clone();
     };
     this.pressRotateLR = function(flag) {
-        rotate(flag);
+        this.rotate(flag);
         newObj.applyMatrix(new THREE.Matrix4().makeRotationZ(tarObj.rotAngle));
-        normCubeAxis(newObj);
+//        this.normCubeAxis(newObj);
         cntr.z += 1;
     };
 
     this.pressRotateFB = function(flag) {
-        rotate(flag);
+        this.rotate(flag);
         newObj.applyMatrix(new THREE.Matrix4().makeRotationX(tarObj.rotAngle));
-        normCubeAxis(newObj);
+//        this.normCubeAxis(newObj);
         cntr.x += 1;
     };
-    move = function(basePoint,flag){
+    this.move = function(basePoint,flag){
         var angl = Math.PI / 2.0 * (flag <0 ? -1 : 1);
-        tarObj.rotAngle = angl;
-        tarObj.step = 0;
         mainCube.rot = 1;
         var nearObj = UTILS.findNearCube(basePoint, mainCube);
         tarObj = nearObj;
+        tarObj.rotAngle = angl;
+        tarObj.step = 0;
         altObj = nearObj.clone();
         newObj = nearObj.clone();
         cntr.addSelf(mainCube.position);
@@ -180,11 +207,11 @@ CUBIC.init = function() {
     
     this.pressMoveLR = function(flag) {
             cntr = new THREE.Vector3(0, 0, 1);
-            move(basePointFront,flag);
+            this.move(basePointFront,flag);
     };
     this.pressMoveFB = function(flag) {
             cntr = new THREE.Vector3(1, 0, 0);
-            move(basePointRight,flag);
+            this.move(basePointRight,flag);
     };
 };
 //                UTILS.rotateAroundWorldAxis(main.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );      

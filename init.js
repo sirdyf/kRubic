@@ -99,8 +99,8 @@ function animate() {
     render();
     controlsMouse.update();
     controls.update();
-    if (scene.mainCube){
-        document.getElementById("val_right").innerHTML = scene.mainCube.getMainCubeChildren();
+    if (scene.main){
+        document.getElementById("val_right").innerHTML = scene.main.getMainCubeChildren();
     }
     requestAnimationFrame(animate);
 }
