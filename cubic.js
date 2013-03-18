@@ -50,6 +50,7 @@ CUBIC.init = function() {
         for(var i in mainCube.children){
             if (mainCube.children[i].name !== "cub") continue;
             this.changeOpacityCube(mainCube.children[i],materialNum,value);
+            break;//материалы у всех кубиков одни
         }
     };
     
@@ -63,6 +64,7 @@ CUBIC.init = function() {
 //                cub.children[ii].material.wireframe=true;
             }
             cub.children[ii].material.needsUpdate=true;
+            break;//материалы у всех кубиков одни
         }
     };
     
@@ -82,6 +84,30 @@ CUBIC.init = function() {
         }
     };
     
+    this.changeWireframe = function(object,flag){
+        for(var ii in object.children){
+            object.children[ii].material.wireframe = flag;
+            object.children[ii].material.needsUpdate=true;
+            break;//материалы у всех кубиков одни
+        }
+    };
+    
+    this.selectStepOneCubes = function(){
+        for(var i in mainCube.children){
+            if (mainCube.children[i].name !== "cub") continue;
+            if (mainCube.children[i].z === -1){
+                this.changeWireframe(mainCube.children[i],true);
+                break;//материалы у всех кубиков одни
+            }
+        }
+    };
+    this.pressSpace = function(){
+        if (demo.value === 0) {
+//            demo.value = 1;
+//            this.changeOpacity(0,"0.3");
+            this.selectStepOneCubes();
+        }
+    };    
     this.createModel = function(obj) {
         this.getMaterialFromObj(obj);
         originCube=obj.clone();
@@ -251,12 +277,6 @@ CUBIC.init = function() {
                 }
             }
         } else {
-        }
-    };
-    this.pressSpace = function(){
-        if (demo.value === 0) {
-//            demo.value = 1;
-//            this.changeOpacity(0,"0.3");
         }
     };
     
