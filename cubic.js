@@ -5,15 +5,15 @@
 var CUBIC = CUBIC || {revision: "ver 1.0"};
 
 CUBIC.init = function() {
-    var workObj = 0;
+//    var workObj = 0;
     var newObj = 0;
     var altObj = 0;
     var tarObj = 0;
     var specialMode = 0;
     var cntr = 0;
     var originCube = new THREE.Object3D();
-    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
-        new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true}));
+//    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
+//        new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true}));
     var mainCube = new THREE.Object3D();
     var basePointFront = new THREE.Vector3(0, 0, -15);
     var basePointBack = new THREE.Vector3(0, 0, 15);
@@ -22,12 +22,13 @@ CUBIC.init = function() {
     var basePointDown = new THREE.Vector3(0, -15, 0);
     var basePointUp = new THREE.Vector3(0, 15, 0);
     var materials = [];
+    var oneStepNumbers = [0,3,6,9,12,15,18,21,24,4,10,16,22];
     // U = d,up,a
     //var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//Шахматы второго порядка
-    //var script1 = ["L","L","R'","F","D","D","L'","F'","D","U'","B","F'","D","R","F","F","D'","L","R","R"];//шахматы третьего порядка
+    var script1 = ["L","L","R'","F","D","D","L'","F'","D","U'","B","F'","D","R","F","F","D'","L","R","R"];//шахматы третьего порядка
     //var script1 = ["D'","B","B","F","F","U","U","L","L","R","R","U'","L'","B'","F","D","U'","L'","R","F","F","D","D","U","U","F'"];//шахматы шестого порядка
     //var script1 = ["U'","L","L","U","F'","R","R","F","U'","L","L","U","F'","R","R","F"];//кубик в кубе
-    var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
+    //var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
     //var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
     //var script1 = ["B","B","L","L","R","R","D","B","B","F","F","L","L","R","R","D","D","U'","F","F","L'","D","U'","B","F'","D","D","U","U","L","R'","U'"];//Глобус
     mainCube.rot = 0;
@@ -47,34 +48,38 @@ CUBIC.init = function() {
         return materials.name[num];
     };
     
-    this.changeOpacity = function(materialNum,value){
-        for(var i in mainCube.children){
-            if (mainCube.children[i].name !== "cub") continue;
-            this.changeOpacityCube(mainCube.children[i],materialNum,value);
-            break;//материалы у всех кубиков одни
-        }
-    };
-    
-    this.changeOpacityCube = function(cub,matNum,val){
-        var name = this.getMaterialName(matNum);
-        for(var ii in cub.children){
-//            cub.children[ii].material["opacity"] = "1.0";
-            if (cub.children[ii].material.name === name){
-//                var tmp=cub.children[ii].material.opacity;
-                cub.children[ii].material.opacity = val;//"0.3"
-//                cub.children[ii].material.wireframe=true;
-            }
-            cub.children[ii].material.needsUpdate=true;
-            break;//материалы у всех кубиков одни
-        }
-    };
+//    this.changeOpacity = function(materialNum,value){
+//        for(var i in mainCube.children){
+//            if (mainCube.children[i].name !== "cub") continue;
+//            this.changeOpacityCube(mainCube.children[i],materialNum,value);
+//            break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
+//        }
+//    };
     
     this.getMaterialFromObj = function(object){
         var tmpMat = [];
+//        var materials_ = [
+//            new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ),
+//            new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
+//            new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, side: THREE.DoubleSide } ),
+//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, side: THREE.DoubleSide, overdraw: true } ),
+//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ),
+//            new THREE.MeshDepthMaterial( { overdraw: true } ),
+//            new THREE.MeshNormalMaterial( { overdraw: true } ),
+//            new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading, overdraw: true } )
+//            new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+//            new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
+//    ];
+        
+        materials.one = new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } );
         if (object.children.length === 0) return;
         for(var i in object.children){
             var mName=object.children[i].material.name;
-//            object.children[i].material.side = THREE.DoubleSide;
+                    
+            if (mName === "FrontColor"){
+                object.children[i].material.side = THREE.DoubleSide;
+//                materials.one=object.children[i].material.clone();
+            }
             tmpMat[mName]=true;
         }
         var k=0;
@@ -84,28 +89,67 @@ CUBIC.init = function() {
             k+=1;
         }
     };
+    this.changeOpacityCube = function(cub,matNum,val){
+        var name = this.getMaterialName(matNum);
+        for(var ii in cub.children){
+//            cub.children[ii].material["opacity"] = "1.0";
+            if (cub.children[ii].material.name === name){
+                cub.children[ii].material.opacity = val;//"0.3"
+                cub.children[ii].material.needsUpdate=true;
+                break;//материалы у всех кубиков одни, достаточно найти первый подходящий материал
+            }
+        }
+    };   
+    this.changeWireframe = function(cub,flag){
+        for(var ii in cub.children){
+            cub.children[ii].material.wireframe = flag;
+            cub.children[ii].material.needsUpdate=true;
+        }
+    };
+    this.deleteFaces = function(cub){
+        for(var i=cub.children.length-1;i>-1;i--){
+            var child=cub.children[i];
+            var mName=child.material.name;
+            var mNulName=this.getMaterialName(0);
+            if (mName === mNulName) continue;//пропускаем периметр
+            cub.remove(child);
+        }
+    };
     
-    this.changeWireframe = function(object,flag){
-        for(var ii in object.children){
-            object.children[ii].material.wireframe = flag;
-            object.children[ii].material.needsUpdate=true;
-            break;//материалы у всех кубиков одни
+    this.setSpecialMateial = function(cub){
+        for(var ii in cub.children){
+            cub.children[ii].material = materials.one;
+            cub.children[ii].material.needsUpdate=true;
         }
     };
     
     this.selectStepOneCubes = function(){
         for(var i in mainCube.children){
             if (mainCube.children[i].name !== "cub") continue;
-            if (mainCube.children[i].z === -1){
+            var ind=mainCube.children[i].cubIndex;
+            var flag=this.checkInterval(ind,oneStepNumbers);
+            if (flag === false){
+//            if (mainCube.children[i].z !== -1){
 //                this.changeWireframe(mainCube.children[i],true);
-//                break;//материалы у всех кубиков одни
+//                this.changeOpacityCube(mainCube.children[i],0,"0.3");
+//                break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
+//                this.deleteFaces(mainCube.children[i]);
+                this.setSpecialMateial(mainCube.children[i]);
             }
         }
     };
+    this.checkInterval = function(num,interval){
+        for (var i=0;i<interval.length;i++){
+            if (num === interval[i]){
+                return true;
+            }
+        }
+        return false;
+    };
+    
     this.pressSpace = function(){
         if (demo.value === 0) {
-//            demo.value = 1;
-//            this.changeOpacity(0,"0.3");
+            demo.value = 1;
             this.selectStepOneCubes();
         }
     };    
