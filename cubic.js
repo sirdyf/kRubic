@@ -12,7 +12,8 @@ CUBIC.init = function() {
     var specialMode = 0;
     var cntr = 0;
     var originCube = new THREE.Object3D();
-    var nullCube = new THREE.Object3D();
+    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
+        new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true}));
     var mainCube = new THREE.Object3D();
     var basePointFront = new THREE.Vector3(0, 0, -15);
     var basePointBack = new THREE.Vector3(0, 0, 15);
@@ -96,8 +97,8 @@ CUBIC.init = function() {
         for(var i in mainCube.children){
             if (mainCube.children[i].name !== "cub") continue;
             if (mainCube.children[i].z === -1){
-                this.changeWireframe(mainCube.children[i],true);
-                break;//материалы у всех кубиков одни
+//                this.changeWireframe(mainCube.children[i],true);
+//                break;//материалы у всех кубиков одни
             }
         }
     };
