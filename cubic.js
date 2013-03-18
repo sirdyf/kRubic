@@ -11,6 +11,8 @@ CUBIC.init = function() {
     var tarObj = 0;
     var specialMode = 0;
     var cntr = 0;
+    var originCube = new THREE.Object3D();
+    var nullCube = new THREE.Object3D();
     var mainCube = new THREE.Object3D();
     var basePointFront = new THREE.Vector3(0, 0, -15);
     var basePointBack = new THREE.Vector3(0, 0, 15);
@@ -18,6 +20,7 @@ CUBIC.init = function() {
     var basePointLeft = new THREE.Vector3(15, 0, 0);
     var basePointDown = new THREE.Vector3(0, -15, 0);
     var basePointUp = new THREE.Vector3(0, 15, 0);
+    var materials = [];
     // U = d,up,a
     //var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//Шахматы второго порядка
     //var script1 = ["L","L","R'","F","D","D","L'","F'","D","U'","B","F'","D","R","F","F","D'","L","R","R"];//шахматы третьего порядка
@@ -37,9 +40,55 @@ CUBIC.init = function() {
     this.getMainCubeChildren = function() {
         return mainCube.children.length - mainCube.defaultChildren;
     };
-
+    
+    this.getMaterialName = function(num){
+        if (num > materials.name.length-1) return null;
+        return materials.name[num];
+    };
+    
+    this.changeOpacity = function(materialNum,value){
+        for(var i in mainCube.children){
+            if (mainCube.children[i].name !== "cub") continue;
+            this.changeOpacityCube(mainCube.children[i],materialNum,value);
+        }
+    };
+    
+    this.changeOpacityCube = function(cub,matNum,val){
+        var name = this.getMaterialName(matNum);
+        for(var ii in cub.children){
+//            cub.children[ii].material["opacity"] = "1.0";
+            if (cub.children[ii].material.name === name){
+//                var tmp=cub.children[ii].material.opacity;
+                cub.children[ii].material.opacity = val;//"0.3"
+//                cub.children[ii].material.wireframe=true;
+            }
+            cub.children[ii].material.needsUpdate=true;
+        }
+    };
+    
+    this.getMaterialFromObj = function(object){
+        var tmpMat = [];
+        if (object.children.length === 0) return;
+        for(var i in object.children){
+            var mName=object.children[i].material.name;
+//            object.children[i].material.side = THREE.DoubleSide;
+            tmpMat[mName]=true;
+        }
+        var k=0;
+        materials.name = [];
+        for (var j in tmpMat){
+            materials.name[k] = j;
+            k+=1;
+        }
+    };
+    
     this.createModel = function(obj) {
+        this.getMaterialFromObj(obj);
+        originCube=obj.clone();
+//        nullCube = new THREE.
         mainCube = obj.clone();
+//        this.materials1 = mainCube.children[0].material;
+//        this.materials1.opacity = 0.1;
         mainCube.defaultChildren = obj.children.length;
         mainCube.rot = 0;
         UTILS.createCubik(mainCube, 1);
@@ -206,7 +255,8 @@ CUBIC.init = function() {
     };
     this.pressSpace = function(){
         if (demo.value === 0) {
-            demo.value = 1;
+//            demo.value = 1;
+//            this.changeOpacity(0,"0.3");
         }
     };
     
