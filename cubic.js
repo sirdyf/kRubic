@@ -19,8 +19,13 @@ CUBIC.init = function() {
     var basePointDown = new THREE.Vector3(0, -15, 0);
     var basePointUp = new THREE.Vector3(0, 15, 0);
     // U = d,up,a
-    var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//"U2","D2","F2","B2","L2","R2"];
-
+    //var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//Шахматы второго порядка
+    //var script1 = ["L","L","R'","F","D","D","L'","F'","D","U'","B","F'","D","R","F","F","D'","L","R","R"];//шахматы третьего порядка
+    //var script1 = ["D'","B","B","F","F","U","U","L","L","R","R","U'","L'","B'","F","D","U'","L'","R","F","F","D","D","U","U","F'"];//шахматы шестого порядка
+    //var script1 = ["U'","L","L","U","F'","R","R","F","U'","L","L","U","F'","R","R","F"];//кубик в кубе
+    var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
+    //var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
+    //var script1 = ["B","B","L","L","R","R","D","B","B","F","F","L","L","R","R","D","D","U'","F","F","L'","D","U'","B","F'","D","D","U","U","L","R'","U'"];//Глобус
     mainCube.rot = 0;
     var demo = [];
     demo.value =0 ;
@@ -115,23 +120,42 @@ CUBIC.init = function() {
     };
     this.processCode = function(c){
         if (c === "U"){
-            this.pressMoveUp(-1);
+            this.pressMoveUp(-1);return;
+        }
+        if (c === "U'"){
+            this.pressMoveUp(1);return;
         }
         if (c === "D"){
-            this.pressMoveDown(1);
+            this.pressMoveDown(1);return;
+        }
+        if (c === "D'"){
+            this.pressMoveDown(-1);return;
         }
         if (c === "F"){
-            this.pressMoveFront(1);
+            this.pressMoveFront(1);return;
+        }
+        if (c === "F'"){
+            this.pressMoveFront(-1);return;
         }
         if (c === "B"){
-            this.pressMoveBack(-1);
+            this.pressMoveBack(-1);return;
+        }
+        if (c === "B'"){
+            this.pressMoveBack(1);return;
         }
         if (c === "R"){
-            this.pressMoveRight(1);
+            this.pressMoveRight(1);return;
+        }
+        if (c === "R'"){
+            this.pressMoveRight(-1);return;
         }
         if (c === "L"){
-            this.pressMoveLeft(-1);
+            this.pressMoveLeft(-1);return;
         }
+        if (c === "L'"){
+            this.pressMoveLeft(1);return;
+        }
+        console.log("Unknown command: ",c);
     };
     
     this.render2 = function() {
