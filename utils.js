@@ -137,10 +137,10 @@ UTILS.rotateAroundWorldAxis = function(object, axis, radians) {
     var rotationMatrix = new THREE.Matrix4();
     rotationMatrix.makeRotationAxis(axis.normalize(), radians);
 
-    rotationMatrix.multiplySelf(object.matrix);                       // pre-multiply
+    rotationMatrix.multiply(object.matrix);                       // pre-multiply
     object.matrix = rotationMatrix;
     object.rotation.setEulerFromRotationMatrix(object.matrix);
-//    object.matrix.multiplySelf( rotationMatrix ); // post-multiply
+//    object.matrixmultiply( rotationMatrix ); // post-multiply
 //    object.rotation.setEulerFromRotationMatrix(object.matrix);//, object.order);    
 };
 UTILS.findNearCube = function(basePos, mainCube) {// !!!!!!!!!!
@@ -231,7 +231,7 @@ UTILS.findChildren = function(base) {//,root){
 //                child.position.addSelf(vBasePos);
 
 //                var mChildRot=new THREE.Matrix4().extractRotation(child.matrix);//.setRotationFromEuler(child.rotation);
-//                var mRes=mChildRot.multiplySelf(mBaseRot);
+//                var mRes=mChildRotmultiply(mBaseRot);
 //                child.rotation.setEulerFromRotationMatrix( mRes );
             if (main) {
 
@@ -264,7 +264,7 @@ UTILS.findChildren = function(base) {//,root){
 //UTILS.rotateAroundWorldAxis2 = function(object, axis, radians) {
 //    var rotationMatrix = new THREE.Matrix4();
 //    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
-//    rotationMatrix.multiplySelf( object.matrix );                       // pre-multiply
+//    rotationMatrixmultiply( object.matrix );                       // pre-multiply
 //    object.matrix = rotationMatrix;
 //    object.rotation.setEulerFromRotationMatrix( object.matrix );
 //};

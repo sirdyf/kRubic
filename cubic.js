@@ -445,7 +445,7 @@ CUBIC.init = function() {
         tarObj.step = 0;
         altObj = nearObj.clone();
         newObj = nearObj.clone();
-        cntr.addSelf(mainCube.position);
+        cntr.add(mainCube.position);
         mainCube.worldToLocal(cntr);
         UTILS.rotateAroundWorldAxis(newObj, cntr, angl);
         UTILS.rebaseFront(mainCube, nearObj);

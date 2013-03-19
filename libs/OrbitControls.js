@@ -138,7 +138,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().subSelf( this.center )
+		var offset = position.clone().sub( this.center );
 
 		// angle from z-axis around y-axis
 
@@ -176,8 +176,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
 
-		position.copy( this.center ).addSelf( offset );
-//		this.object.copy( this.center ).addSelf( offset );
+		position.copy( this.center ).add( offset );
+//		this.object.copy( this.center ).add( offset );
 
 		this.object.lookAt( this.center );
 
@@ -196,13 +196,13 @@ THREE.OrbitControls = function ( object, domElement ) {
                 
                 if (state === STATE.NONE){
 //                    if (camera.targetCube){
-//                    var targetPos=camera.targetCube.position.clone().subSelf(scene.mainCube.position);
-//                    var camLen=camera.position.clone().subSelf(scene.mainCube.position).length();
+//                    var targetPos=camera.targetCube.position.clone().sub(scene.mainCube.position);
+//                    var camLen=camera.position.clone().sub(scene.mainCube.position).length();
 //                    targetPos.normalize().multiplyScalar(camLen);
 //                    scene.tmpCube.position.copy(targetPos);
 //                    var vTar=camera.position.clone();
 //                    vTar.y=targetPos.y;
-////                    vTar.subSelf(targetPos);
+////                    vTar.sub(targetPos);
 //                    var anglTar=vTar.angleTo(targetPos);
 //                    if (anglTar>0.1){
 //                        this.rotateLeft(0.05);
@@ -214,9 +214,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 //        this.findFrontCube = function (){
 //            var obj=scene.mainCube.children[0];
 //            var camPos=this.object.position.clone();
-//            var dist = obj.position.clone().subSelf(camPos).length();
+//            var dist = obj.position.clone().sub(camPos).length();
 //            for (var index=1;index<scene.mainCube.children.length;index++) {
-//                var deltaDir=scene.mainCube.children[index].position.clone().subSelf(camPos).length();
+//                var deltaDir=scene.mainCube.children[index].position.clone().sub(camPos).length();
 //                if (deltaDir<dist){
 //                    dist=deltaDir;
 //                    obj=scene.mainCube.children[index];
@@ -238,7 +238,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseDown( event ) {
 
-		if ( !scope.userRotate ) return;
+
+            if ( !scope.userRotate ) return;
 
 		event.preventDefault();
 
@@ -268,7 +269,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( state === STATE.ROTATE ) {
 
 			rotateEnd.set( event.clientX, event.clientY );
-			rotateDelta.sub( rotateEnd, rotateStart );
+			rotateDelta.subVectors( rotateEnd, rotateStart );
 
 			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * scope.userRotateSpeed );
 			scope.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * scope.userRotateSpeed );
@@ -278,7 +279,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		} else if ( state === STATE.ZOOM ) {
 
 			zoomEnd.set( event.clientX, event.clientY );
-			zoomDelta.sub( zoomEnd, zoomStart );
+			zoomDelta.subVectors( zoomEnd, zoomStart );
 
 			if ( zoomDelta.y > 0 ) {
 

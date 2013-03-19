@@ -6,7 +6,7 @@ var SCREEN_HEIGHT = window.innerHeight;
 
 var container, stats;
 
-var camera, scene, renderer;
+var camera, scene, renderer,projector;
 
 var num = 0;
 
@@ -17,11 +17,16 @@ var windowHalfY = window.innerHeight / 2;
 var controls, time = Date.now();
 var clock = new THREE.Clock();
 
+var mouseRay = { x: 0, y: 0 }, INTERSECTED;
+
 init();
 animate();
 
 function init() {
     this.init = true;
+    
+    projector = new THREE.Projector();
+    
     container = document.createElement('div');
     document.body.appendChild(container);
 
@@ -96,12 +101,12 @@ function init() {
 
 function animate() {
 
-    render();
     controlsMouse.update();
     controls.update();
     if (scene.main){
         document.getElementById("val_right").innerHTML = scene.main.getMainCubeChildren();
     }
+    render();
     requestAnimationFrame(animate);
 }
 //    document.getElementById( "val_right" ).innerHTML = vv;
@@ -109,22 +114,63 @@ function render() {
 
     scene.main.render();
 
+    ray();
+
     renderer.render(scene, camera);
 
     stats.update();
 }
+function onDocumentMouseMove( event ) {
 
+        event.preventDefault();
 
-var onKeyDownMain = function(event) {
+        mouseRay.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouseRay.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
+document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+function ray(){
+    // find intersections
+
+    var vector = new THREE.Vector3( mouseRay.x, mouseRay.y, 1 );
+    projector.unprojectVector( vector, camera );
+
+    var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+    var child = scene.main.getMainObj();
+    var intersects = raycaster.intersectObjects( child.children);//children );
+
+    if ( intersects.length > 0 ) {
+
+            if ( INTERSECTED != intersects[ 0 ].object ) {
+
+                    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+                    INTERSECTED = intersects[ 0 ].object;
+                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+                    INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+            }
+
+    } else {
+
+            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+            INTERSECTED = null;
+
+    }
+};
+
+//var onKeyDownMain = function(event) {
 //    if (event.keyCode === 32) { // Пробел
 //        if (scene.specialMode === 0) {
 //            scene.specialMode = 1;
 //            scene.tmpObj = scene.mainCube.clone();
 //        }
 //    }
-};
+//};
 
-document.addEventListener('keydown', onKeyDownMain, false);
+//document.addEventListener('keydown', onKeyDownMain, false);
 
 function onWindowResize() {
 
