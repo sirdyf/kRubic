@@ -59,12 +59,37 @@ CUBIC.init = function() {
     var mNameFront = 0;
     var mNameUp = 0;
     var mNameBack = 0;
+    var selMode=0;
+    var selCube1=0,selCube2=0;
 
     this.pressSpace = function() {
         if (demo.value === 0) {
             demo.value = 1;
             this.selectStepOneCubes();
         }
+    };
+    this.showAvailablePositions = function(){
+        var selCubePos=selCube1.position.clone();//.sub(mainCube.position);
+        var numCube = UTILS.getIndex(selCubePos);
+        //проверки на попадание индекса в группу угловых или центральных кубиков
+    };
+    
+    this.clickLeftButton = function(){
+        if (selMode === 0){//первый кубик выбран
+            selCube1=this.nullCube.clone();
+            scene.add(selCube1);
+            this.showAvailablePositions();
+            selMode=1;
+            return;
+        }
+        if (selMode === 1){//второй клик
+            //проверить клик на этот же куб
+            selCube2 = 0;
+            selMode = 2;//включить режим поворота
+            
+            return;
+        }
+        
     };
     this.clearAllLayers = function() {
         var flag = false;

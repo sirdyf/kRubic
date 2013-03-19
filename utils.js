@@ -1,14 +1,22 @@
 var UTILS = UTILS || {REVISION: '0.1'};
+
 UTILS.numericCube = function(base) {
     for (var i in base.children) {
         var obj = base.children[i];
         var pos = obj.position.clone();
-        obj.x = this.getIndexValue(pos.x);
-        obj.y = this.getIndexValue(pos.y);
-        obj.z = this.getIndexValue(pos.z);
-        obj.cubIndex = obj.z + 1 + (obj.y + 1) * 3 + (obj.x + 1) * 9;
+        
+        obj.cubIndex = this.getIndex(pos);//obj.z + 1 + (obj.y + 1) * 3 + (obj.x + 1) * 9;
+        obj.x = pos.x;
+        obj.y = pos.y;
+        obj.z = pos.z;
         console.log(obj.z, obj.y, obj.x, obj.cubIndex);
     }
+};
+UTILS.getIndex = function(v){//нормирует исходный вектор!
+        v.x = this.getIndexValue(v.x);
+        v.y = this.getIndexValue(v.y);
+        v.z = this.getIndexValue(v.z);
+    return (v.z + 1 + (v.y + 1) * 3 + (v.x + 1) * 9);
 };
 
 //UTILS.createBox = function(scale,model){
@@ -71,9 +79,9 @@ UTILS.conv = function(x, y, z) {
 };
 UTILS.getIndexValue = function(value) {
     var val = value;
-    if (val > 0)
+    if (val > 0.01)
         val = 1;
-    if (val < 0)
+    if (val < 0.01)
         val = -1;
     return val;
 };

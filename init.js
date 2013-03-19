@@ -72,8 +72,8 @@ function init() {
     scene.add(scene.basePointRight);
     
     var nullCube1 = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
-    scene.nullCube = nullCube1;
-    scene.add(scene.nullCube);
+    scene.main.nullCube = nullCube1;
+    scene.add(scene.main.nullCube);
     // model
 
     var loader = new THREE.OBJMTLLoader();
@@ -131,6 +131,10 @@ function onDocumentMouseMove( event ) {
         mouseRay.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 }
+//function onMouseUp( event ) {
+//        event.preventDefault();
+//}
+//document.addEventListener( 'mouseup', onMouseUp, false );
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 function ray(){
@@ -150,14 +154,14 @@ function ray(){
                     if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
                     INTERSECTED = intersects[ 0 ].object;
-                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-                    INTERSECTED.material.emissive.setHex( 0xff0000 );
-                    scene.nullCube.position.copy(intersects[ 0 ].object.parent.position);
+//                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+//                    INTERSECTED.material.emissive.setHex( 0xff0000 );
+                    scene.main.nullCube.position.copy(intersects[ 0 ].object.parent.position);
             }
 
     } else {
 
-            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+//            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
             INTERSECTED = null;
 

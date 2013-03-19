@@ -242,8 +242,12 @@ THREE.OrbitControls = function ( object, domElement ) {
             if ( !scope.userRotate ) return;
 
 		event.preventDefault();
+		if ( event.button === 0  ) {
+                    scene.main.clickLeftButton();
+                }
 
-		if ( event.button === 0 || event.button === 2 ) {
+
+		if ( event.button === 2 ) {
 
 			state = STATE.ROTATE;
 
