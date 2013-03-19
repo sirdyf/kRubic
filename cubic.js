@@ -1,19 +1,17 @@
-  /* 
+/* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 var CUBIC = CUBIC || {revision: "ver 1.0"};
 
+//    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
 CUBIC.init = function() {
-//    var workObj = 0;
     var newObj = 0;
     var altObj = 0;
     var tarObj = 0;
     var specialMode = 0;
     var cntr = 0;
     var originCube = new THREE.Object3D();
-//    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
-//        new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true}));
     var mainCube = new THREE.Object3D();
     var basePointFront = new THREE.Vector3(0, 0, -15);
     var basePointBack = new THREE.Vector3(0, 0, 15);
@@ -22,10 +20,31 @@ CUBIC.init = function() {
     var basePointDown = new THREE.Vector3(0, -15, 0);
     var basePointUp = new THREE.Vector3(0, 15, 0);
     var materials = [];
-    var oneStepNumbers = [0,3,6,9,12,15,18,21,24,4,10,16,22];
-    // U = d,up,a
+    //      _________
+    //     /        /|
+    //    /   16   / |
+    //   /________/  |
+    //  |24 15  6| 4 |
+    //22|21 12  3|  /
+    //  |18  9  0| /
+    //   -------- /
+    //      10
+    var oneStepNeed = [0, 6, 18, 24];
+    var oneStepNumbers = [3, 9, 12, 15, 21, 4, 10, 16, 22];
+    var oneStepAll = [0, 3, 6, 9, 12, 15, 18, 21, 24, 4, 10, 16, 22];
+
+    var layerDown = [0, 1, 2, 9, 10, 11, 18, 19, 20];
+    var layerHorisontal = [3, 4, 5, 12, 13, 14, 21, 22, 23];
+    var layerUp = [6, 7, 8, 15, 16, 17, 24, 25, 26];
+    var layerRight = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    var layerVertical = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+    var layerLeft = [18, 19, 20, 21, 22, 23, 24, 25, 26];
+    var layerFront = [0, 3, 6, 9, 12, 15, 18, 21, 24];
+    var layerMFB = [1, 4, 7, 10, 13, 16, 19, 22, 25];
+    var layerBack = [2, 5, 8, 11, 14, 17, 20, 23, 26];
+
     //var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//Шахматы второго порядка
-    var script1 = ["L","L","R'","F","D","D","L'","F'","D","U'","B","F'","D","R","F","F","D'","L","R","R"];//шахматы третьего порядка
+    var script1 = ["L", "L", "R'", "F", "D", "D", "L'", "F'", "D", "U'", "B", "F'", "D", "R", "F", "F", "D'", "L", "R", "R"];//шахматы третьего порядка
     //var script1 = ["D'","B","B","F","F","U","U","L","L","R","R","U'","L'","B'","F","D","U'","L'","R","F","F","D","D","U","U","F'"];//шахматы шестого порядка
     //var script1 = ["U'","L","L","U","F'","R","R","F","U'","L","L","U","F'","R","R","F"];//кубик в кубе
     //var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
@@ -33,8 +52,79 @@ CUBIC.init = function() {
     //var script1 = ["B","B","L","L","R","R","D","B","B","F","F","L","L","R","R","D","D","U'","F","F","L'","D","U'","B","F'","D","D","U","U","L","R'","U'"];//Глобус
     mainCube.rot = 0;
     var demo = [];
-    demo.value =0 ;
+    demo.value = 0;
+    var mNameRight = 0;
+    var mNameLeft = 0;
+    var mNameDown = 0;
+    var mNameFront = 0;
+    var mNameUp = 0;
+    var mNameBack = 0;
 
+    this.pressSpace = function() {
+        if (demo.value === 0) {
+            demo.value = 1;
+            this.selectStepOneCubes();
+        }
+    };
+    this.clearAllLayers = function() {
+        var flag = false;
+        for (var i in mainCube.children) {
+            if (mainCube.children[i].name !== "cub")
+                continue;
+            var ind = mainCube.children[i].cubIndex;
+
+            flag = this.checkInterval(ind, layerRight);
+            if (flag === true)
+                this.setGreyMateial(mainCube.children[i], mNameLeft);
+
+            flag = this.checkInterval(ind, layerVertical);
+            if (flag === true) {
+                this.setGreyMateial(mainCube.children[i], mNameLeft);
+                this.setGreyMateial(mainCube.children[i], mNameRight);
+            }
+            flag = this.checkInterval(ind, layerLeft);
+            if (flag === true)
+                this.setGreyMateial(mainCube.children[i], mNameRight);
+
+            flag = this.checkInterval(ind, layerDown);
+            if (flag === true)
+                this.setGreyMateial(mainCube.children[i], mNameUp);
+
+            flag = this.checkInterval(ind, layerHorisontal);
+            if (flag === true) {
+                this.setGreyMateial(mainCube.children[i], mNameUp);
+                this.setGreyMateial(mainCube.children[i], mNameDown);
+            }
+            flag = this.checkInterval(ind, layerUp);
+            if (flag === true)
+                this.setGreyMateial(mainCube.children[i], mNameDown);
+
+
+
+
+            flag = this.checkInterval(ind, layerFront);
+            if (flag === true)
+                this.setGreyMateial(mainCube.children[i], mNameBack);
+
+            flag = this.checkInterval(ind, layerMFB);
+            if (flag === true) {
+                this.setGreyMateial(mainCube.children[i], mNameFront);
+                this.setGreyMateial(mainCube.children[i], mNameBack);
+            }
+            flag = this.checkInterval(ind, layerBack);
+            if (flag === true)
+                this.setGreyMateial(mainCube.children[i], mNameFront);
+        }
+    };
+
+    this.setGreyMateial = function(cub, mName) {
+        for (var ii in cub.children) {
+            if (cub.children[ii].material.name === mName) {
+                cub.children[ii].material = materials.grey;
+                cub.children[ii].material.needsUpdate = true;
+            }
+        }
+    };
     this.getMainObj = function() {
         return mainCube;
     };
@@ -42,120 +132,98 @@ CUBIC.init = function() {
     this.getMainCubeChildren = function() {
         return mainCube.children.length - mainCube.defaultChildren;
     };
-    
-    this.getMaterialName = function(num){
-        if (num > materials.name.length-1) return null;
+
+    this.getMaterialName = function(num) {
+        if (num > materials.name.length - 1)
+            return null;
         return materials.name[num];
     };
-    
-//    this.changeOpacity = function(materialNum,value){
-//        for(var i in mainCube.children){
-//            if (mainCube.children[i].name !== "cub") continue;
-//            this.changeOpacityCube(mainCube.children[i],materialNum,value);
-//            break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
-//        }
-//    };
-    
-    this.getMaterialFromObj = function(object){
+
+    this.getMaterialFromObj = function(object) {
         var tmpMat = [];
-//        var materials_ = [
-//            new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ),
-//            new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
-//            new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, side: THREE.DoubleSide } ),
-//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, side: THREE.DoubleSide, overdraw: true } ),
-//            new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ),
-//            new THREE.MeshDepthMaterial( { overdraw: true } ),
-//            new THREE.MeshNormalMaterial( { overdraw: true } ),
-//            new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading, overdraw: true } )
-//            new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-//            new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
-//    ];
-        
-        materials.one = new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } );
-        if (object.children.length === 0) return;
-        for(var i in object.children){
-            var mName=object.children[i].material.name;
-                    
-            if (mName === "FrontColor"){
+        materials.grey = new THREE.MeshBasicMaterial({color: 0x111111});//new THREE.MeshLambertMaterial({color: 0x111111, shading: THREE.FlatShading, overdraw: true}); 
+        materials.one = new THREE.MeshBasicMaterial({color: 0x00ffff, wireframe: true, side: THREE.DoubleSide});
+        if (object.children.length === 0)
+            return;
+        for (var i in object.children) {
+            var mName = object.children[i].material.name;
+
+            if (mName === "FrontColor") {
                 object.children[i].material.side = THREE.DoubleSide;
 //                materials.one=object.children[i].material.clone();
             }
-            tmpMat[mName]=true;
+            tmpMat[mName] = true;
         }
-        var k=0;
+        var k = 0;
         materials.name = [];
-        for (var j in tmpMat){
+        for (var j in tmpMat) {
             materials.name[k] = j;
-            k+=1;
+            k += 1;
         }
     };
-    this.changeOpacityCube = function(cub,matNum,val){
+    this.changeOpacityCube = function(cub, matNum, val) {
         var name = this.getMaterialName(matNum);
-        for(var ii in cub.children){
+        for (var ii in cub.children) {
 //            cub.children[ii].material["opacity"] = "1.0";
-            if (cub.children[ii].material.name === name){
+            if (cub.children[ii].material.name === name) {
                 cub.children[ii].material.opacity = val;//"0.3"
-                cub.children[ii].material.needsUpdate=true;
+                cub.children[ii].material.needsUpdate = true;
                 break;//материалы у всех кубиков одни, достаточно найти первый подходящий материал
             }
         }
-    };   
-    this.changeWireframe = function(cub,flag){
-        for(var ii in cub.children){
+    };
+    this.changeWireframe = function(cub, flag) {
+        for (var ii in cub.children) {
             cub.children[ii].material.wireframe = flag;
-            cub.children[ii].material.needsUpdate=true;
+            cub.children[ii].material.needsUpdate = true;
         }
     };
-    this.deleteFaces = function(cub){
-        for(var i=cub.children.length-1;i>-1;i--){
-            var child=cub.children[i];
-            var mName=child.material.name;
-            var mNulName=this.getMaterialName(0);
-            if (mName === mNulName) continue;//пропускаем периметр
+    this.deleteFaces = function(cub) {
+        for (var i = cub.children.length - 1; i > -1; i--) {
+            var child = cub.children[i];
+            var mName = child.material.name;
+            var mNulName = this.getMaterialName(0);
+            if (mName === mNulName)
+                continue;//пропускаем периметр
             cub.remove(child);
         }
     };
-    
-    this.setSpecialMateial = function(cub){
-        for(var ii in cub.children){
+
+    this.setWireframeMateial = function(cub) {
+        for (var ii in cub.children) {
             cub.children[ii].material = materials.one;
-            cub.children[ii].material.needsUpdate=true;
+            cub.children[ii].material.needsUpdate = true;
         }
     };
-    
-    this.selectStepOneCubes = function(){
-        for(var i in mainCube.children){
-            if (mainCube.children[i].name !== "cub") continue;
-            var ind=mainCube.children[i].cubIndex;
-            var flag=this.checkInterval(ind,oneStepNumbers);
-            if (flag === false){
+
+    this.selectStepOneCubes = function() {
+        for (var i in mainCube.children) {
+            if (mainCube.children[i].name !== "cub")
+                continue;
+            var ind = mainCube.children[i].cubIndex;
+            var flag = this.checkInterval(ind, oneStepNumbers);
+            if (flag === false) {
 //            if (mainCube.children[i].z !== -1){
 //                this.changeWireframe(mainCube.children[i],true);
 //                this.changeOpacityCube(mainCube.children[i],0,"0.3");
 //                break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
 //                this.deleteFaces(mainCube.children[i]);
-                this.setSpecialMateial(mainCube.children[i]);
+                this.setWireframeMateial(mainCube.children[i]);
             }
         }
     };
-    this.checkInterval = function(num,interval){
-        for (var i=0;i<interval.length;i++){
-            if (num === interval[i]){
+    this.checkInterval = function(num, interval) {
+        for (var i = 0; i < interval.length; i++) {
+            if (num === interval[i]) {
                 return true;
             }
         }
         return false;
     };
-    
-    this.pressSpace = function(){
-        if (demo.value === 0) {
-            demo.value = 1;
-            this.selectStepOneCubes();
-        }
-    };    
+
     this.createModel = function(obj) {
         this.getMaterialFromObj(obj);
-        originCube=obj.clone();
+        originCube = obj.clone();
 //        nullCube = new THREE.
         mainCube = obj.clone();
 //        this.materials1 = mainCube.children[0].material;
@@ -165,6 +233,14 @@ CUBIC.init = function() {
         UTILS.createCubik(mainCube, 1);
         UTILS.normChildren(mainCube);
         UTILS.numericCube(mainCube);
+
+        mNameRight = this.getMaterialName(1);
+        mNameLeft = this.getMaterialName(2);
+        mNameDown = this.getMaterialName(3);
+        mNameFront = this.getMaterialName(4);
+        mNameUp = this.getMaterialName(5);
+        mNameBack = this.getMaterialName(6);
+        this.clearAllLayers();
     };
 
     this.normCubeAxis = function(obj) {
@@ -200,7 +276,7 @@ CUBIC.init = function() {
         }
     };
     this.render = function() {
-        if (demo.value === 0){
+        if (demo.value === 0) {
             if (mainCube.rot !== 0) {
                 var workObj = altObj.clone();
                 var angle = tarObj.rotAngle * tarObj.step;
@@ -212,72 +288,84 @@ CUBIC.init = function() {
                     UTILS.normChildren(mainCube);
                 }
             }
-        }else{
-                if (mainCube.rot !== 0) {
-                    var workObj = altObj.clone();
-                    var angle = tarObj.rotAngle * tarObj.step;
-                    UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
-                    tarObj.rotation.copy(workObj.rotation);
-                    tarObj.step += 0.1;
-                    if (tarObj.step > 1) {
-                        mainCube.rot = 0;
-                        UTILS.normChildren(mainCube);
-                    }
-                }else{
-                    this.nextStep();
+        } else {
+            if (mainCube.rot !== 0) {
+                var workObj = altObj.clone();
+                var angle = tarObj.rotAngle * tarObj.step;
+                UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
+                tarObj.rotation.copy(workObj.rotation);
+                tarObj.step += 0.1;
+                if (tarObj.step > 1) {
+                    mainCube.rot = 0;
+                    UTILS.normChildren(mainCube);
                 }
+            } else {
+                this.nextStep();
+            }
         }
     };
-    this.nextStep = function(){
-        if (demo.value > script1.length){
-            demo.value=0;
-            mainCube.rot=0;
-        }else{
-            var code=script1[demo.value-1];
+    this.nextStep = function() {
+        if (demo.value > script1.length) {
+            demo.value = 0;
+            mainCube.rot = 0;
+        } else {
+            var code = script1[demo.value - 1];
             this.processCode(code);
-            demo.value+=1;
+            demo.value += 1;
         }
     };
-    this.processCode = function(c){
-        if (c === "U"){
-            this.pressMoveUp(-1);return;
+    this.processCode = function(c) {
+        if (c === "U") {
+            this.pressMoveUp(-1);
+            return;
         }
-        if (c === "U'"){
-            this.pressMoveUp(1);return;
+        if (c === "U'") {
+            this.pressMoveUp(1);
+            return;
         }
-        if (c === "D"){
-            this.pressMoveDown(1);return;
+        if (c === "D") {
+            this.pressMoveDown(1);
+            return;
         }
-        if (c === "D'"){
-            this.pressMoveDown(-1);return;
+        if (c === "D'") {
+            this.pressMoveDown(-1);
+            return;
         }
-        if (c === "F"){
-            this.pressMoveFront(1);return;
+        if (c === "F") {
+            this.pressMoveFront(1);
+            return;
         }
-        if (c === "F'"){
-            this.pressMoveFront(-1);return;
+        if (c === "F'") {
+            this.pressMoveFront(-1);
+            return;
         }
-        if (c === "B"){
-            this.pressMoveBack(-1);return;
+        if (c === "B") {
+            this.pressMoveBack(-1);
+            return;
         }
-        if (c === "B'"){
-            this.pressMoveBack(1);return;
+        if (c === "B'") {
+            this.pressMoveBack(1);
+            return;
         }
-        if (c === "R"){
-            this.pressMoveRight(1);return;
+        if (c === "R") {
+            this.pressMoveRight(1);
+            return;
         }
-        if (c === "R'"){
-            this.pressMoveRight(-1);return;
+        if (c === "R'") {
+            this.pressMoveRight(-1);
+            return;
         }
-        if (c === "L"){
-            this.pressMoveLeft(-1);return;
+        if (c === "L") {
+            this.pressMoveLeft(-1);
+            return;
         }
-        if (c === "L'"){
-            this.pressMoveLeft(1);return;
+        if (c === "L'") {
+            this.pressMoveLeft(1);
+            return;
         }
-        console.log("Unknown command: ",c);
+        console.log("Unknown command: ", c);
     };
-    
+
     this.render2 = function() {
         if (specialMode !== 0) {
             var vsPos = mainCube.position.clone();
@@ -324,9 +412,9 @@ CUBIC.init = function() {
         } else {
         }
     };
-    
-    this.rotate = function(flag){
-        var angl = Math.PI / 2.0 * (flag <0 ? -1 : 1);
+
+    this.rotate = function(flag) {
+        var angl = Math.PI / 2.0 * (flag < 0 ? -1 : 1);
         tarObj = mainCube;
         altObj = mainCube.clone();
         newObj = mainCube.clone();
@@ -348,8 +436,8 @@ CUBIC.init = function() {
 //        this.normCubeAxis(newObj);
         cntr.x += 1;
     };
-    this.move = function(basePoint,flag){
-        var angl = Math.PI / 2.0 * (flag <0 ? -1 : 1);
+    this.move = function(basePoint, flag) {
+        var angl = Math.PI / 2.0 * (flag < 0 ? -1 : 1);
         mainCube.rot = 1;
         var nearObj = UTILS.findNearCube(basePoint, mainCube);
         tarObj = nearObj;
@@ -362,30 +450,30 @@ CUBIC.init = function() {
         UTILS.rotateAroundWorldAxis(newObj, cntr, angl);
         UTILS.rebaseFront(mainCube, nearObj);
     };
-    
+
     this.pressMoveFront = function(flag) {
-            cntr = new THREE.Vector3(0, 0, 1);
-            this.move(basePointFront,flag);
+        cntr = new THREE.Vector3(0, 0, 1);
+        this.move(basePointFront, flag);
     };
     this.pressMoveBack = function(flag) {
-            cntr = new THREE.Vector3(0, 0, 1);
-            this.move(basePointBack,flag);
+        cntr = new THREE.Vector3(0, 0, 1);
+        this.move(basePointBack, flag);
     };
     this.pressMoveRight = function(flag) {
-            cntr = new THREE.Vector3(1, 0, 0);
-            this.move(basePointRight,flag);
+        cntr = new THREE.Vector3(1, 0, 0);
+        this.move(basePointRight, flag);
     };
     this.pressMoveLeft = function(flag) {
-            cntr = new THREE.Vector3(1, 0, 0);
-            this.move(basePointLeft,flag);
+        cntr = new THREE.Vector3(1, 0, 0);
+        this.move(basePointLeft, flag);
     };
     this.pressMoveUp = function(flag) {
-            cntr = new THREE.Vector3(0, 1, 0);
-            this.move(basePointUp,flag);
+        cntr = new THREE.Vector3(0, 1, 0);
+        this.move(basePointUp, flag);
     };
     this.pressMoveDown = function(flag) {
-            cntr = new THREE.Vector3(0, 1, 0);
-            this.move(basePointDown,flag);
+        cntr = new THREE.Vector3(0, 1, 0);
+        this.move(basePointDown, flag);
     };
 };
 //                UTILS.rotateAroundWorldAxis(main.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );      
