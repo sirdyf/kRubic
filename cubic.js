@@ -61,6 +61,25 @@ CUBIC.init = function() {
     var mNameBack = 0;
     var selMode=0;
     var selCube1=0,selCube2=0;
+    var nullCube=0;
+//-------------
+    (this.creates = function(){
+
+        nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
+        var objectAxis = new THREE.AxisHelper( 5 );
+        nullCube.add(objectAxis);
+        scene.add(nullCube);
+        
+//        nullCube.add( nullCube.objectAxis );
+
+//    object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
+//    object.position.set( 200, 0, 400 );
+//    scene.add( object );
+    })();
+//-------------
+    this.setNullCubePosition = function(obj){
+        nullCube.position.copy(obj.parent.position);
+    };
 
     this.pressSpace = function() {
         if (demo.value === 0) {
@@ -500,5 +519,6 @@ CUBIC.init = function() {
         cntr = new THREE.Vector3(0, 1, 0);
         this.move(basePointDown, flag);
     };
+    
 };
 //                UTILS.rotateAroundWorldAxis(main.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );      

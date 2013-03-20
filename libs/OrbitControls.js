@@ -243,7 +243,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 		if ( event.button === 0  ) {
-                    scene.main.clickLeftButton();
+//                    scene.main.clickLeftButton();
                 }
 
 

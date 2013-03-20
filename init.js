@@ -71,9 +71,6 @@ function init() {
     scene.basePointRight.position = new THREE.Vector3(-15, 0, 0);
     scene.add(scene.basePointRight);
     
-    var nullCube1 = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
-    scene.main.nullCube = nullCube1;
-    scene.add(scene.main.nullCube);
     // model
 
     var loader = new THREE.OBJMTLLoader();
@@ -156,7 +153,9 @@ function ray(){
                     INTERSECTED = intersects[ 0 ].object;
 //                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
 //                    INTERSECTED.material.emissive.setHex( 0xff0000 );
-                    scene.main.nullCube.position.copy(intersects[ 0 ].object.parent.position);
+                    if (scene.main){
+                        scene.main.setNullCubePosition(intersects[ 0 ].object);
+                    }
             }
 
     } else {
