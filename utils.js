@@ -18,7 +18,14 @@ UTILS.getIndex = function(v){//нормирует исходный вектор!
         v.z = this.getIndexValue(v.z);
     return (v.z + 1 + (v.y + 1) * 3 + (v.x + 1) * 9);
 };
-
+UTILS.getIndexValue = function(value) {
+    var val = value;
+    if (val > 0.01)
+        val = 1;
+    if (val < -0.01)
+        val = -1;
+    return val;
+};
 //UTILS.createBox = function(scale,model){
 ////    var mat = new THREE.MeshLambertMaterial({color: 0x11ffff, shading: THREE.FlatShading, overdraw: true});
 ////THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
@@ -76,14 +83,6 @@ UTILS.conv = function(x, y, z) {
         x = -(2 * Math.PI - x);
     }
     return x;
-};
-UTILS.getIndexValue = function(value) {
-    var val = value;
-    if (val > 0.01)
-        val = 1;
-    if (val < 0.01)
-        val = -1;
-    return val;
 };
 
 UTILS.cloneBox = function(base, vx2, vy2, vz2) {
@@ -258,9 +257,40 @@ UTILS.findChildren = function(base) {//,root){
             }
         }
 //        }
-    }
-    ;
+    };
+    
 //    base.children.length=0;
+};
+UTILS.rndint = function(min, max) {
+    max = max || 1;
+    min = min || 0;
+    UTILS.seed = UTILS.seed || 2013;
+    UTILS.seed = (UTILS.seed * 9301 + 49297) % 233280;
+    var _rnd = UTILS.seed / 233280;
+ 
+    return Math.round(min + _rnd * (max - min));
+};
+UTILS.generateName = function(num){
+    var glSpaceName = "allexegezacebisousesarmaindirea?eratenberalavetiedorquanteisrion";
+    //"al le xe ge za ce bi so us es ar ma in di re a? er at en be ra la ve ti ed or qu an te is ri on";
+    var name="";
+    var tmp ="";
+    UTILS.seed=num || 1979;
+    for(var i=0;i<3;i++){
+        var rnd= UTILS.rndint(0,31)*2;//Math.round(Math.random()*31)*2;
+        tmp += rnd+" ";
+        name += glSpaceName.charAt(rnd);
+        if (rnd === 30) continue;
+        name += glSpaceName.charAt(rnd+1);
+    }
+    rnd= UTILS.rndint(0,31);//Math.round(Math.random()*31);
+        tmp += rnd+" ";
+    if (rnd<10){
+            name += glSpaceName.charAt(rnd*2)+glSpaceName.charAt(rnd*2+1);
+    }
+    name = name.charAt(0).toUpperCase()+name.slice(1);
+    console.log(tmp,name);
+    return name;
 };
 //UTILS.saveCubicToTemp = function(base){
 //    this.tmpCube = base.clone();

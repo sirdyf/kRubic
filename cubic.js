@@ -62,21 +62,19 @@ CUBIC.init = function() {
     var selMode=0;
     var selCube1=0,selCube2=0;
     var nullCube=0;
-//-------------
-    (this.creates = function(){
 
+    (this.creates = function(){
         nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
         var objectAxis = new THREE.AxisHelper( 5 );
+        var objectArrow = new THREE.ArrowHelper( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 3 );
+        nullCube.add(objectArrow);
         nullCube.add(objectAxis);
         scene.add(nullCube);
-        
-//        nullCube.add( nullCube.objectAxis );
-
-//    object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
-//    object.position.set( 200, 0, 400 );
-//    scene.add( object );
+//        for (var i=0;i<50;i++){
+//            UTILS.generateName(Math.round(Math.random()*123456));
+//        }
     })();
-//-------------
+
     this.setNullCubePosition = function(obj){
         nullCube.position.copy(obj.parent.position);
     };
