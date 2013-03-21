@@ -38,6 +38,7 @@ CUBIC.init = function() {
     var oneStepNumbers = [3, 9, 12, 15, 21, 4, 10, 16, 22];
     var oneStepAll = [0, 3, 6, 9, 12, 15, 18, 21, 24, 4, 10, 16, 22];
 
+    var layerCenterCubes = [4,10,12,14,16,22];
     var layerDown = [0, 1, 2, 9, 10, 11, 18, 19, 20];
     var layerHorisontal = [3, 4, 5, 12, 13, 14, 21, 22, 23];
     var layerUp = [6, 7, 8, 15, 16, 17, 24, 25, 26];
@@ -56,6 +57,7 @@ CUBIC.init = function() {
         [ 1, 9,11,19],//bottom
         [ 5,11,17,23]//back
     ];
+
 
     //var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//Шахматы второго порядка
     var script1 = ["L", "L", "R'", "F", "D", "D", "L'", "F'", "D", "U'", "B", "F'", "D", "R", "F", "F", "D'", "L", "R", "R"];//шахматы третьего порядка
@@ -90,9 +92,47 @@ CUBIC.init = function() {
     })();
 
     this.setNullCubePosition = function(obj){
-        nullCube.position.copy(obj.parent.position);
-    };
 
+        nullCube.position.copy(obj.parent.position);
+        nullCube.cubIndex = obj.parent.cubIndex;
+        if (selMode === 1){//первый кубик выбран
+//            var delta=selCube1.position.clone().sub(obj.parent.position);
+            var cntrCube=this.findCenterCubeFor(obj.parent);
+            if (cntrCube < 0) return;
+            var cCub=this.getChildAtNumer(cntrCube);
+            
+            cCub.scale=new THREE.Vector3(1.5,1.5,1.5);
+        }
+    };
+    this.findCenterCubeFor = function(secondCube){
+        var centrCube=-1;
+        var num1=selCube1.cubIndex;
+        var num2=secondCube.cubIndex;
+        if (!num1 || num1<0) return -1;
+        if (!num2 || num2<0) return -1;
+           
+        var fl1=false,fl2=false;
+        fl1=this.checkInterval(num1,layerFront);
+        fl2=this.checkInterval(num2,layerFront);
+        if (fl1 && fl2) centrCube=12;
+        fl1=this.checkInterval(num1,layerBack);
+        fl2=this.checkInterval(num2,layerBack);
+        if (fl1 && fl2) centrCube=14;
+        fl1=this.checkInterval(num1,layerLeft);
+        fl2=this.checkInterval(num2,layerLeft);
+        if (fl1 && fl2) centrCube=22;
+        fl1=this.checkInterval(num1,layerRight);
+        fl2=this.checkInterval(num2,layerRight);
+        if (fl1 && fl2) centrCube=4;
+        fl1=this.checkInterval(num1,layerUp);
+        fl2=this.checkInterval(num2,layerUp);
+        if (fl1 && fl2) centrCube=16;
+        fl1=this.checkInterval(num1,layerDown);
+        fl2=this.checkInterval(num2,layerDown);
+        if (fl1 && fl2) centrCube=10;
+        return centrCube;
+    };
+    
     this.pressSpace = function() {
         if (demo.value === 0) {
             demo.value = 1;
@@ -101,7 +141,12 @@ CUBIC.init = function() {
     };
     this.showAvailablePositions = function(){
         var selCubePos=selCube1.position.clone();//.sub(mainCube.position);
+        
         var numCube = UTILS.getIndex(selCubePos);
+        if (numCube !== selCube1.cubIndex) {
+            console.warn("cubic.showAvailablePositions: num cube error");
+            return;
+        }
         //проверки на попадание индекса в группу угловых или центральных кубиков
         if (this.checkInterval(numCube,layerVertex) === true){
             //выбран угловой
@@ -157,6 +202,7 @@ CUBIC.init = function() {
     this.clickLeftButton = function(){
         if (selMode === 0){//первый кубик выбран
             selCube1=nullCube.clone();
+            selCube1.cubIndex=nullCube.cubIndex;//????
             scene.add(selCube1);
             this.showAvailablePositions();
             selMode=1;
