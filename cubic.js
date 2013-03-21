@@ -78,9 +78,12 @@ CUBIC.init = function() {
     var selMode=0;
     var selCube1=0,selCube2=0;
     var nullCube=0;
+    var nullFace=0;
 
     (this.creates = function(){
         nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
+        nullFace = nullCube.clone();
+        nullFace.scale = new THREE.Vector3(3,3,1);
         var objectAxis = new THREE.AxisHelper( 5 );
         var objectArrow = new THREE.ArrowHelper( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 3 );
         nullCube.add(objectArrow);
@@ -89,6 +92,8 @@ CUBIC.init = function() {
 //        for (var i=0;i<50;i++){
 //            UTILS.generateName(Math.round(Math.random()*123456));
 //        }
+//        scene.add(nullFace);
+//        mainCube.add(nullFace);
     })();
 
     this.setNullCubePosition = function(obj){
@@ -101,7 +106,9 @@ CUBIC.init = function() {
             if (cntrCube < 0) return;
             var cCub=this.getChildAtNumer(cntrCube);
             
-            cCub.scale=new THREE.Vector3(1.5,1.5,1.5);
+//            cCub.scale=new THREE.Vector3(1.5,1.5,1.5);
+            nullFace.position.copy(cCub.position);
+            nullFace.rotation.copy(cCub.rotation);
         }
     };
     this.findCenterCubeFor = function(secondCube){
