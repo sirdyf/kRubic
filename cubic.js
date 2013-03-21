@@ -84,22 +84,24 @@ CUBIC.init = function() {
         nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
         nullFace = nullCube.clone();
         nullFace.scale = new THREE.Vector3(3,3,1);
-        var objectAxis = new THREE.AxisHelper( 5 );
+        var objectAxis = new THREE.AxisHelper( 4 );
         var objectArrow = new THREE.ArrowHelper( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 3 );
+        nullCube.arrow=objectArrow;
         nullCube.add(objectArrow);
         nullCube.add(objectAxis);
         scene.add(nullCube);
 //        for (var i=0;i<50;i++){
 //            UTILS.generateName(Math.round(Math.random()*123456));
 //        }
-//        scene.add(nullFace);
-//        mainCube.add(nullFace);
+        scene.add(nullFace);
     })();
 
     this.setNullCubePosition = function(obj){
 
         nullCube.position.copy(obj.parent.position);
         nullCube.cubIndex = obj.parent.cubIndex;
+        var dir=obj.geometry.faces[0].normal;
+        nullCube.arrow.setDirection(dir);
         if (selMode === 1){//первый кубик выбран
 //            var delta=selCube1.position.clone().sub(obj.parent.position);
             var cntrCube=this.findCenterCubeFor(obj.parent);
@@ -108,7 +110,10 @@ CUBIC.init = function() {
             
 //            cCub.scale=new THREE.Vector3(1.5,1.5,1.5);
             nullFace.position.copy(cCub.position);
-            nullFace.rotation.copy(cCub.rotation);
+//            nullFace.rotation.copy(cCub.rotation);
+            nullFace.scale.x=Math.abs(cCub.position.x)*3 || 1;
+            nullFace.scale.y=Math.abs(cCub.position.y)*3 || 1;
+            nullFace.scale.z=Math.abs(cCub.position.z)*3 || 1;
         }
     };
     this.findCenterCubeFor = function(secondCube){
