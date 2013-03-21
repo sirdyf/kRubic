@@ -104,7 +104,7 @@ function animate() {
     controlsMouse.update();
     controls.update();
     if (scene.main){
-        document.getElementById("val_right").innerHTML = scene.main.getMainCubeChildren();
+        document.getElementById("val_right").innerHTML = scene.main.getMainCubeChildrenCount();
     }
     render();
     requestAnimationFrame(animate);

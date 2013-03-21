@@ -3,7 +3,12 @@
  * and open the template in the editor.
  */
 var CUBIC = CUBIC || {revision: "ver 1.0"};
-
+// this.myRemove = function () {
+//      if(canvas && canvas.parentNode){ 
+//          var myParent=canvas.parentNode;
+//          myParent.removeChild(canvas);
+//      }
+//    };
 //    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
 CUBIC.init = function() {
     var newObj = 0;
@@ -20,15 +25,15 @@ CUBIC.init = function() {
     var basePointDown = new THREE.Vector3(0, -15, 0);
     var basePointUp = new THREE.Vector3(0, 15, 0);
     var materials = [];
-    //      _________
-    //     /        /|
-    //    /   16   / |
-    //   /________/  |
-    //  |24 15  6| 4 |
-    //22|21 12  3|  /
-    //  |18  9  0| /
-    //   -------- /
-    //      10
+    //      _________        _________
+    //     /        /|      |\        \   
+    //    /   16   / |      | \   16   \  
+    //   /________/  |      |  \________\
+    //  |24 15  6| 4 |      | 4 | 8 17 26|
+    //22|21 12  3|  /        \  | 5 14 23|22
+    //  |18  9  0| /          \ | 2 11 20|  
+    //   -------- /            \ --------     
+    //      10                      10        
     var oneStepNeed = [0, 6, 18, 24];
     var oneStepNumbers = [3, 9, 12, 15, 21, 4, 10, 16, 22];
     var oneStepAll = [0, 3, 6, 9, 12, 15, 18, 21, 24, 4, 10, 16, 22];
@@ -42,6 +47,15 @@ CUBIC.init = function() {
     var layerFront = [0, 3, 6, 9, 12, 15, 18, 21, 24];
     var layerMFB = [1, 4, 7, 10, 13, 16, 19, 22, 25];
     var layerBack = [2, 5, 8, 11, 14, 17, 20, 23, 26];
+    var layerVertex= [0, 2, 6, 8,18,20,24,26];
+    var layerX=[
+        [ 3, 9,15,21],//front
+        [ 1, 3, 5, 7],//right
+        [ 7,15,17,25],//top
+        [19,21,23,25],//left
+        [ 1, 9,11,19],//bottom
+        [ 5,11,17,23]//back
+    ];
 
     //var script1 = ["U","U","D","D","F","F","B","B","L","L","R","R"];//Шахматы второго порядка
     var script1 = ["L", "L", "R'", "F", "D", "D", "L'", "F'", "D", "U'", "B", "F'", "D", "R", "F", "F", "D'", "L", "R", "R"];//шахматы третьего порядка
@@ -89,11 +103,60 @@ CUBIC.init = function() {
         var selCubePos=selCube1.position.clone();//.sub(mainCube.position);
         var numCube = UTILS.getIndex(selCubePos);
         //проверки на попадание индекса в группу угловых или центральных кубиков
+        if (this.checkInterval(numCube,layerVertex) === true){
+            //выбран угловой
+            this.markCubes(layerVertex);
+        }
+        var lFace = this.checkIntervalX(numCube,layerX);
+        if ( lFace > -1){
+            //выбран центральный
+            this.markCubes(layerX[1]);
+        }
+    };
+    this.applyForAllCubes = function(fn){
+        for (var i in mainCube.children){
+            if (mainCube.children[i].name !== "cub") continue;
+            fn.call(this);
+        }
+    };
+    this.applyForCubesList = function(fn,cubesList,flag){
+        for (var i in mainCube.children){
+            if (mainCube.children[i].name !== "cub") continue;
+            var numCub = mainCube.children[i].cubIndex;
+            var fl = this.checkInterval(numCub,cubesList);
+            if ( fl === true) {
+                fn.call(this,numCub);
+            }
+        }
+    };
+    this.getChildAtNumer = function(num){
+        for(var i in mainCube.children){
+            if (mainCube.children[i].name !== "cub") continue;
+            if (mainCube.children[i].cubIndex === num) return mainCube.children[i];
+        }
+        return null;
+    };
+    
+    this.markCubes = function(listCubes,flag){
+        this.applyForCubesList(this.markCubeNum,listCubes);
+    };
+    this.markCubeNum = function(cub){
+        var cube =cub;
+        if (isNaN(cub) === true){
+            var a=0;
+        }else{
+            //поиск кубика
+            cube = this.getChildAtNumer(cub);
+        }
+        if (cube === null) return;
+        this.setWireframeMateialToCube(cube,true);
+//                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+//                    INTERSECTED.material.emissive.setHex( 0xff0000 );
     };
     
     this.clickLeftButton = function(){
         if (selMode === 0){//первый кубик выбран
-            selCube1=this.nullCube.clone();
+            selCube1=nullCube.clone();
             scene.add(selCube1);
             this.showAvailablePositions();
             selMode=1;
@@ -171,7 +234,7 @@ CUBIC.init = function() {
         return mainCube;
     };
 
-    this.getMainCubeChildren = function() {
+    this.getMainCubeChildrenCount = function() {
         return mainCube.children.length - mainCube.defaultChildren;
     };
 
@@ -214,12 +277,6 @@ CUBIC.init = function() {
             }
         }
     };
-    this.changeWireframe = function(cub, flag) {
-        for (var ii in cub.children) {
-            cub.children[ii].material.wireframe = flag;
-            cub.children[ii].material.needsUpdate = true;
-        }
-    };
     this.deleteFaces = function(cub) {
         for (var i = cub.children.length - 1; i > -1; i--) {
             var child = cub.children[i];
@@ -230,8 +287,18 @@ CUBIC.init = function() {
             cub.remove(child);
         }
     };
+    this.setWireframeToMaterial = function(cub,matNum,flag) {//один конкретный материал в режим wireframe
+        var name = this.getMaterialName(matNum);
+        for (var ii in cub.children) {
+            if (cub.children[ii].material.name === name) {
+                cub.children[ii].material.wireframe = flag;
+                cub.children[ii].material.needsUpdate = true;
+                break;//материалы у всех кубиков одни, достаточно найти первый подходящий материал
+            }
+        }
+    };
 
-    this.setWireframeMateial = function(cub) {
+    this.setWireframeMateialToCube = function(cub) {//все материалы у кубика в wireframe
         for (var ii in cub.children) {
             cub.children[ii].material = materials.one;
             cub.children[ii].material.needsUpdate = true;
@@ -250,7 +317,7 @@ CUBIC.init = function() {
 //                this.changeOpacityCube(mainCube.children[i],0,"0.3");
 //                break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
 //                this.deleteFaces(mainCube.children[i]);
-                this.setWireframeMateial(mainCube.children[i]);
+                this.setWireframeMateialToCube(mainCube.children[i]);
             }
         }
     };
@@ -262,7 +329,15 @@ CUBIC.init = function() {
         }
         return false;
     };
-
+    this.checkIntervalX = function(num, intervalX) {
+        if (this.checkInterval(num,intervalX[0]) === true) return 0;
+        if (this.checkInterval(num,intervalX[1]) === true) return 1;
+        if (this.checkInterval(num,intervalX[2]) === true) return 2;
+        if (this.checkInterval(num,intervalX[3]) === true) return 3;
+        if (this.checkInterval(num,intervalX[4]) === true) return 4;
+        if (this.checkInterval(num,intervalX[5]) === true) return 5;
+        return -1;
+    };
     this.createModel = function(obj) {
         this.getMaterialFromObj(obj);
         originCube = obj.clone();
@@ -520,3 +595,15 @@ CUBIC.init = function() {
     
 };
 //                UTILS.rotateAroundWorldAxis(main.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );      
+//[11:34:25] Sasha: 
+//function switchMode(noSwitchOnlyRefresh) {
+//    if(noSwitchOnlyRefresh === false) menuMode = !menuMode;//???
+//    if(menuMode) {
+//        menu = new MenuMake(container, scene, camera, SCREEN_WIDTH, SCREEN_HEIGHT);
+//        //menu.show = true; //делать при создании внутри MenuMake
+//    }else{
+//        scaner = new ScanerMake(container, scene, camera, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
+//        //scaner.show = true;//делать при создании внутри ScanerMake
+//        laser = new LaserMake();  
+//    }
+//}
