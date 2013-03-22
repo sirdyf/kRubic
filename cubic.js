@@ -11,6 +11,7 @@ var CUBIC = CUBIC || {revision: "ver 1.0"};
 //    };
 //    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
 CUBIC.init = function() {
+//    var box;
     var newObj = 0;
     var altObj = 0;
     var tarObj = 0;
@@ -227,7 +228,7 @@ CUBIC.init = function() {
             
             return;
         }
-        
+//        box=box;
     };
     this.clearAllLayers = function() {
         var flag = false;
@@ -650,7 +651,18 @@ CUBIC.init = function() {
         cntr = new THREE.Vector3(0, 1, 0);
         this.move(basePointDown, flag);
     };
-    
+    this.getBoundingBox = function(obj){
+        var box = new THREE.Box3();//this.geometry.boundingBox.clone();
+        obj.traverse(function(child){
+             if (child instanceof THREE.Mesh) {
+                child.geometry.computeBoundingBox();
+                var childbox = child.geometry.boundingBox.clone();
+                childbox.translate( child.localToWorld( new THREE.Vector3() ));
+                box.union( childbox );
+             }
+        });
+        return box;
+    };
 };
 //                UTILS.rotateAroundWorldAxis(main.workObj,cntr,Math.PI/2);// * (rotateYawСCW ? -1 : 1) );      
 //[11:34:25] Sasha: 
