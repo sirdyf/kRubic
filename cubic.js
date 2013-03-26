@@ -274,16 +274,23 @@ CUBIC.init = function() {
     
     this.setNullCubePosition = function(obj){
 
-        nullCube.position.copy(obj.parent.position);
-        nullCube.cubIndex = obj.parent.cubIndex;
-        var dir=obj.geometry.faces[0].normal;
-        nullCube.arrow.setDirection(dir);
-        
-        var centerCubeNum=this.findRotateCenter(dir);
-        var cub=this.getChildAtNumer(centerCubeNum);
-        if (cub){
-            nullFace.position.copy(cub.position);
-            nullFace.scale=this.computeScaleForCube(cub);
+        if (state === cSTATE.NONE){
+
+            nullCube.position.copy(obj.parent.position);
+            nullCube.cubIndex = obj.parent.cubIndex;
+            var dir=obj.geometry.faces[0].normal.clone();
+//            dir.applyMatrix4(obj.matrixWorld);//matrixWorld);//matrixRotationWorld
+            var rotMatrix = new THREE.Matrix4();
+            rotMatrix.setRotationFromEuler(obj.parent.rotation);
+            dir.applyMatrix4(rotMatrix);
+            nullCube.arrow.setDirection(dir);
+
+            var centerCubeNum=this.findRotateCenter(dir);
+            var cub=this.getChildAtNumer(centerCubeNum);
+            if (cub){
+                nullFace.position.copy(cub.position);
+                nullFace.scale=this.computeScaleForCube(cub);
+            }
         }
 //        if (selMode === 1){//первый кубик выбран
 ////            var delta=selCube1.position.clone().sub(obj.parent.position);
@@ -303,15 +310,55 @@ CUBIC.init = function() {
         if (state === cSTATE.NONE){
             
         }
-        if (state === cSTATE.ROTATE){}
+        if (state === cSTATE.ROTATE){
+            var deltaX=(mousePos.x-posX)/100.0;
+            var deltaY=(mousePos.y-posY)/100.0;
+            var angle=deltaX;
+//            if (Math.abs(deltaX)>Math.abs(deltaY)){
+//                angle=deltaX;//windowHalfX/deltaX;
+//            }else{
+//                angle=deltaY;//windowHalfY/deltaY;
+//            }
+            if (angle>Math.PI / 2.0) angle=Math.PI / 2.0;
+            if (angle<-Math.PI / 2.0) angle=-Math.PI / 2.0;
+            
+            tarObj.rotAngle = angle;
+        }
     };
     
     this.leftButtonUp = function(){
         state = cSTATE.NONE;
+        var angle=tarObj.rotAngle;
+        if (angle>0){
+            tarObj.rotAngle=Math.PI / 2.0;
+        }else{
+            tarObj.rotAngle=-Math.PI / 2.0;
+        }
+        tarObj.step=angle/tarObj.rotAngle;
+//        var workObj = altObj.clone();
+//        var angle = tarObj.rotAngle * tarObj.step;
+//        UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
+//        tarObj.rotation.copy(workObj.rotation);
+//        tarObj.step += 0.1;
+//        mainCube.rot = 0;
+//        UTILS.normChildren(mainCube);
+//        tarObj.rotAngle =0;
+        newObj=altObj.clone();
+        UTILS.rotateAroundWorldAxis(newObj, cntr, tarObj.rotAngle);
+        demo.value=0;
+        mainCube.rot=1;
     };
     this.leftButtonDown = function(posX,posY){
         state = cSTATE.ROTATE;
+        
         mousePos.set(posX,posY);
+        cntr = basePoints[basePointCurrent].clone();//new THREE.Vector3(0, 0, 1);
+        var vPos=basePoints[basePointCurrent].clone().multiplyScalar(baseScale);
+        this.move(vPos, true);
+        tarObj.rotAngle = 0;
+        demo.value=99;
+//        t.
+    };
 //        if (selMode === 0){//первый кубик выбран
 //            selCube1=nullCube.clone();
 //            selCube1.cubIndex=nullCube.cubIndex;//????
@@ -328,7 +375,7 @@ CUBIC.init = function() {
 //            return;
 //        }
 //        box=box;
-    };
+//    };
     this.clearAllLayers = function() {
         var flag = false;
         for (var i in mainCube.children) {
@@ -557,17 +604,19 @@ CUBIC.init = function() {
                 tarObj.step += 0.1;
                 if (tarObj.step > 1) {
                     mainCube.rot = 0;
+                    tarObj.rotation.copy(newObj.rotation);
                     UTILS.normChildren(mainCube);
                 }
             }
-        }
-        if (demo.value === 99){
-            //поворот мышкой
-                var workObj = altObj.clone();
-                var angle = tarObj.rotAngle;
-                UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
-                tarObj.rotation.copy(workObj.rotation);
-        }else {
+        } else {
+            if (demo.value === 99){
+                //поворот мышкой
+                    var workObj = altObj.clone();
+                    var angle = tarObj.rotAngle;
+                    UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
+                    tarObj.rotation.copy(workObj.rotation);
+                    return;
+            }
             if (mainCube.rot !== 0) {
                 var workObj = altObj.clone();
                 var angle = tarObj.rotAngle * tarObj.step;
