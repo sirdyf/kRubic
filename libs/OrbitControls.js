@@ -243,7 +243,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 		if ( event.button === 0  ) {
-                    scene.main.clickLeftButton();
+                    scene.main.leftButtonDown(event.clientX, event.clientY);
                 }
 
 
@@ -303,6 +303,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
+                
+		if ( event.button === 0  ) {
+                    scene.main.leftButtonUp();
+                }
 		if ( ! scope.userRotate ) return;
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );

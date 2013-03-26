@@ -127,7 +127,7 @@ function onDocumentMouseMove( event ) {
 
         mouseRay.x = ( event.clientX / window.innerWidth ) * 2 - 1;
         mouseRay.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
+        scene.main.mouseMove(mouseRay.x,mouseRay.y);
 }
 //function onMouseUp( event ) {
 //        event.preventDefault();
