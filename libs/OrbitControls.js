@@ -307,6 +307,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( event.button === 0  ) {
                     scene.main.leftButtonUp();
                 }
+		if ( event.button === 2  ) {
+                    scene.main.rightButtonUp();
+                }
 		if ( ! scope.userRotate ) return;
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );

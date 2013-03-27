@@ -16,15 +16,15 @@ CUBIC.init = function() {
     var tarObj = 0;
     var cntr = 0;
     
-    var baseScale = 15;
+    var baseScale = 5;
     var basePointCurrent = 0;
     var basePoints = [
-        new THREE.Vector3(0, 0, -1),//basePointFront
-        new THREE.Vector3(0, 0, 1),//basePointBack
-        new THREE.Vector3(-1, 0, 0),//basePointRight
-        new THREE.Vector3(1, 0, 0),//basePointLeft
-        new THREE.Vector3(0, -1, 0),//basePointDown
-        new THREE.Vector3(0, 1, 0)//basePointUp
+        new THREE.Vector3(0, 0, -1),//0-basePointFront
+        new THREE.Vector3(0, 1, 0), //1-basePointUp
+        new THREE.Vector3(-1, 0, 0),//2-basePointRight
+        new THREE.Vector3(0, 0, 1), //3-basePointBack
+        new THREE.Vector3(0, -1, 0),//4-basePointDown
+        new THREE.Vector3(1, 0, 0)  //5-basePointLeft
     ];
     var materials = [];
     
@@ -78,7 +78,7 @@ CUBIC.init = function() {
     //var script1 = ["D'","B","B","F","F","U","U","L","L","R","R","U'","L'","B'","F","D","U'","L'","R","F","F","D","D","U","U","F'"];//шахматы шестого порядка
     //var script1 = ["U'","L","L","U","F'","R","R","F","U'","L","L","U","F'","R","R","F"];//кубик в кубе
     //var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
-    //var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
+    var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
     //var script1 = ["B","B","L","L","R","R","D","B","B","F","F","L","L","R","R","D","D","U'","F","F","L'","D","U'","B","F'","D","D","U","U","L","R'","U'"];//Глобус
 
     (this.creates = function() {
@@ -95,6 +95,15 @@ CUBIC.init = function() {
         nullCube.add(objectAxis);
 //        scene.add(nullCube);
         scene.add(nullFace);
+        
+        for(var i=0;i<6;i++){
+            var point = new THREE.Mesh(new THREE.SphereGeometry(1, 7, 7));
+            point.position.copy(basePoints[i].clone().multiplyScalar(baseScale));
+            if (i <3 ) point.scale.set(0.1,0.1,0.1);
+            point.name = "controlPoint";
+            scene.add(point);
+        }
+
     })();
 
     this.computeFrontLayer = function() {
@@ -151,8 +160,8 @@ CUBIC.init = function() {
             demo.bMode = true;
             mainCube.bRotation = true;
             demo.value = 1;
-            this.nextStep();
 //            this.selectStepOneCubes();
+            this.nextStep();
         }
     };
     
@@ -273,7 +282,11 @@ CUBIC.init = function() {
             sc.z = 3;
         return sc;
     };
-
+    this.clearSelection = function(){
+        nullFace.position.set(0,0,0);
+        nullFace.scale.set(1,1,1);
+    };
+    
     this.setNullCubePosition = function(obj) {
 
         if (state === cSTATE.NONE) {
@@ -317,6 +330,22 @@ CUBIC.init = function() {
         }
     };
 
+    this.rightButtonUp = function() {
+        var controlPoints=[];
+        var arr =[];
+        scene.traverse(function(child){
+           if (child.name === "controlPoint") controlPoints.push(child);
+        });
+        console.log("find: " + controlPoints.length+" control points.");
+        for (var i = 0; i < controlPoints.length; i++) {
+            arr[i] = controlPoints[i].position.clone().sub(camera.position).length();
+        }
+        arr.sort(function(a, b) { return a - b; });
+        console.log(arr);
+//        var _min = Math.min.apply(null, arr);
+//        var _ind = arr.indexOf(_min);
+    };
+    
     this.leftButtonUp = function() {
         if (state !== cSTATE.ROTATE) return;
         var angle = tarObj.rotAngle;
@@ -334,6 +363,7 @@ CUBIC.init = function() {
     
     this.leftButtonDown = function(posX, posY) {
         if (state === cSTATE.WAIT) return;
+        if (nullFace.position.lengthSq() === 0) return;
         state = cSTATE.ROTATE;
 
         mousePos.set(posX, posY);
@@ -376,9 +406,6 @@ CUBIC.init = function() {
             flag = this.checkInterval(ind, layerUp);
             if (flag === true)
                 this.setGreyMateial(mainCube.children[i], mNameDown);
-
-
-
 
             flag = this.checkInterval(ind, layerFront);
             if (flag === true)
@@ -489,11 +516,6 @@ CUBIC.init = function() {
             var ind = mainCube.children[i].cubIndex;
             var flag = this.checkInterval(ind, oneStepNumbers);
             if (flag === false) {
-//            if (mainCube.children[i].z !== -1){
-//                this.changeWireframe(mainCube.children[i],true);
-//                this.changeOpacityCube(mainCube.children[i],0,"0.3");
-//                break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
-//                this.deleteFaces(mainCube.children[i]);
                 this.setWireframeMateialToCube(mainCube.children[i]);
             }
         }
@@ -717,7 +739,7 @@ CUBIC.init = function() {
     };
     this.pressMoveBack = function(flag) {
         cntr = new THREE.Vector3(0, 0, 1);
-        this.pressMoves(1,flag);
+        this.pressMoves(3,flag);
     };
     this.pressMoveRight = function(flag) {
         cntr = new THREE.Vector3(1, 0, 0);
@@ -725,11 +747,11 @@ CUBIC.init = function() {
     };
     this.pressMoveLeft = function(flag) {
         cntr = new THREE.Vector3(1, 0, 0);
-        this.pressMoves(3,flag);
+        this.pressMoves(5,flag);
     };
     this.pressMoveUp = function(flag) {
         cntr = new THREE.Vector3(0, 1, 0);
-        this.pressMoves(5,flag);
+        this.pressMoves(1,flag);
     };
     this.pressMoveDown = function(flag) {
         cntr = new THREE.Vector3(0, 1, 0);
@@ -795,3 +817,13 @@ CUBIC.init = function() {
 //        }
 //    };    
 };
+//            if (mainCube.children[i].z !== -1){
+//                this.changeWireframe(mainCube.children[i],true);
+//                this.changeOpacityCube(mainCube.children[i],0,"0.3");
+//                break;//материалы у всех кубиков одни, поэтому берём первый попавшийся куб
+//                this.deleteFaces(mainCube.children[i]);
+//['banana', 'apple'].map(function(fruit, index) {
+//    return {index: index, fruit: fruit};
+//}).sort(function(fruit1, fruit2) {
+//    return fruit1.fruit < fruit2.fruit ? -1 : fruit1.fruit > fruit2.fruit ? 1 : 0;
+//})

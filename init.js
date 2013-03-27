@@ -63,13 +63,7 @@ function init() {
     }
     scene.main = new CUBIC.init();
 
-    scene.basePointFront = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
-    scene.basePointFront.position = new THREE.Vector3(0, 0, -15);
-    scene.add(scene.basePointFront);
 
-    scene.basePointRight = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10));
-    scene.basePointRight.position = new THREE.Vector3(-15, 0, 0);
-    scene.add(scene.basePointRight);
     
     // model
 
@@ -162,7 +156,7 @@ function ray(){
     } else {
 
 //            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
+        scene.main.clearSelection();
             INTERSECTED = null;
 
     }
