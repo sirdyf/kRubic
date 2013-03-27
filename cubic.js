@@ -1,18 +1,10 @@
 /* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * autor: DYF
  */
 var CUBIC = CUBIC || {revision: "ver 1.0"};
-// this.myRemove = function () {
-//      if(canvas && canvas.parentNode){ 
-//          var myParent=canvas.parentNode;
-//          myParent.removeChild(canvas);
-//      }
-//    };
-//    var nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1), 
+ 
 CUBIC.init = function() {
-//    var box;
-    var cSTATE = { NONE : -1, ROTATE : 0, ZOOM : 1 };
+    var cSTATE = {NONE: -1, ROTATE: 0, WAIT: 1};
     var state = cSTATE.NONE;
     var newObj = 0;
     var altObj = 0;
@@ -21,22 +13,22 @@ CUBIC.init = function() {
     var cntr = 0;
     var originCube = new THREE.Object3D();
     var mainCube = new THREE.Object3D();
-    var mousePos= new THREE.Vector3();
+    var mousePos = new THREE.Vector3();
     var baseScale = 15;
-    var basePointCurrent=0;
-    var basePointFront = new THREE.Vector3(0, 0, -15);
-    var basePointBack = new THREE.Vector3(0, 0, 15);
-    var basePointRight = new THREE.Vector3(-15, 0, 0);
-    var basePointLeft = new THREE.Vector3(15, 0, 0);
-    var basePointDown = new THREE.Vector3(0, -15, 0);
-    var basePointUp = new THREE.Vector3(0, 15, 0);
+    var basePointCurrent = 0;
+//    var basePointFront = new THREE.Vector3(0, 0, -15);
+//    var basePointBack = new THREE.Vector3(0, 0, 15);
+//    var basePointRight = new THREE.Vector3(-15, 0, 0);
+//    var basePointLeft = new THREE.Vector3(15, 0, 0);
+//    var basePointDown = new THREE.Vector3(0, -15, 0);
+//    var basePointUp = new THREE.Vector3(0, 15, 0);
     var basePoints = [
-        new THREE.Vector3(0, 0, -1),
-        new THREE.Vector3(0, 0, 1),
-        new THREE.Vector3(-1, 0, 0),
-        new THREE.Vector3(1, 0, 0),
-        new THREE.Vector3(0, -1, 0),
-        new THREE.Vector3(0, 1, 0)
+        new THREE.Vector3(0, 0, -1),//basePointFront
+        new THREE.Vector3(0, 0, 1),//basePointBack
+        new THREE.Vector3(-1, 0, 0),//basePointRight
+        new THREE.Vector3(1, 0, 0),//basePointLeft
+        new THREE.Vector3(0, -1, 0),//basePointDown
+        new THREE.Vector3(0, 1, 0)//basePointUp
     ];
     var materials = [];
     //      _________        _________
@@ -52,9 +44,9 @@ CUBIC.init = function() {
     var oneStepNumbers = [3, 9, 12, 15, 21, 4, 10, 16, 22];
     var oneStepAll = [0, 3, 6, 9, 12, 15, 18, 21, 24, 4, 10, 16, 22];
 
-    var layerCenterCubes = [4,10,12,14,16,22];
-    var layerVertex= [0, 2, 6, 8,18,20,24,26];
-    
+    var layerCenterCubes = [4, 10, 12, 14, 16, 22];
+    var layerVertex = [0, 2, 6, 8, 18, 20, 24, 26];
+
     var layerDown = [0, 1, 2, 9, 10, 11, 18, 19, 20];
     var layerHorisontal = [3, 4, 5, 12, 13, 14, 21, 22, 23];
     var layerUp = [6, 7, 8, 15, 16, 17, 24, 25, 26];
@@ -64,25 +56,27 @@ CUBIC.init = function() {
     var layerFront = [0, 3, 6, 9, 12, 15, 18, 21, 24];
     var layerMFB = [1, 4, 7, 10, 13, 16, 19, 22, 25];
     var layerBack = [2, 5, 8, 11, 14, 17, 20, 23, 26];
-    var layerX=[
-        [ 3, 9,15,21],//front
-        [ 1, 3, 5, 7],//right
-        [ 7,15,17,25],//top
-        [19,21,23,25],//left
-        [ 1, 9,11,19],//bottom
-        [ 5,11,17,23]//back
+    var layerX = [
+        [3, 9, 15, 21], //front
+        [1, 3, 5, 7], //right
+        [7, 15, 17, 25], //top
+        [19, 21, 23, 25], //left
+        [1, 9, 11, 19], //bottom
+        [5, 11, 17, 23]//back
     ];
-    this.computeFrontLayer = function(){
-        var frontPosition =new THREE.Vector3(0,0,-1);
-        var frontIndex=UTILS.getIndex(frontPosition);
-        if (layerCenterCubes[0] !== frontIndex){console.warn("front cube index error!");}
-        
-        
-        
+    this.computeFrontLayer = function() {
+        var frontPosition = new THREE.Vector3(0, 0, -1);
+        var frontIndex = UTILS.getIndex(frontPosition);
+        if (layerCenterCubes[0] !== frontIndex) {
+            console.warn("front cube index error!");
+        }
+
+
+
 //        this.applyForAllfaces(this.findLikeFaces,new THREE.Vector);
     };
-    
-    this.computeLayers = function(){
+
+    this.computeLayers = function() {
         this.computeFrontLayer();
     };
 
@@ -93,289 +87,264 @@ CUBIC.init = function() {
     //var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
     //var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
     //var script1 = ["B","B","L","L","R","R","D","B","B","F","F","L","L","R","R","D","D","U'","F","F","L'","D","U'","B","F'","D","D","U","U","L","R'","U'"];//Глобус
-    mainCube.rot = 0;
+    mainCube.bRotation = false;
+    
     var demo = [];
     demo.value = 0;
+    demo.bMode = false;
+    
     var mNameRight = 0;
     var mNameLeft = 0;
     var mNameDown = 0;
     var mNameFront = 0;
     var mNameUp = 0;
     var mNameBack = 0;
-    var selMode=0;
-    var selCube1=0,selCube2=0;
-    var nullCube=0;
-    var nullFace=0;
+    var selMode = 0;
+    var selCube1 = 0, selCube2 = 0;
+    var nullCube = 0;
+    var nullFace = 0;
 
-    (this.creates = function(){
-        nullCube = new THREE.Mesh(new THREE.CubeGeometry(1,1,1,1,1,1),new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
+    (this.creates = function() {
+        nullCube = new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1, 1, 1, 1), new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
         nullFace = nullCube.clone();
-        nullFace.scale = new THREE.Vector3(3,3,1);
-        var objectAxis = new THREE.AxisHelper( 4 );
-        var objectArrow = new THREE.ArrowHelper( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 3 );
-        nullCube.arrow=objectArrow;
+        nullFace.scale = new THREE.Vector3(3, 3, 1);
+        var objectAxis = new THREE.AxisHelper(4);
+        var objectArrow = new THREE.ArrowHelper(new THREE.Vector3(1, 1, 0), new THREE.Vector3(0, 0, 0), 3);
+        nullCube.arrow = objectArrow;
         nullCube.add(objectArrow);
         nullCube.add(objectAxis);
-        scene.add(nullCube);
-//        for (var i=0;i<50;i++){
-//            UTILS.generateName(Math.round(Math.random()*123456));
-//        }
+//        scene.add(nullCube);
         scene.add(nullFace);
     })();
 
-    this.findCenterCubeFor = function(secondCube){
-        var centrCube=-1;
-        var num1=selCube1.cubIndex;
-        var num2=secondCube.cubIndex;
-        if (!num1 || num1<0) return -1;
-        if (!num2 || num2<0) return -1;
-           
-        var fl1=false,fl2=false;
-        fl1=this.checkInterval(num1,layerFront);
-        fl2=this.checkInterval(num2,layerFront);
-        if (fl1 && fl2) centrCube=12;
-        fl1=this.checkInterval(num1,layerBack);
-        fl2=this.checkInterval(num2,layerBack);
-        if (fl1 && fl2) centrCube=14;
-        fl1=this.checkInterval(num1,layerLeft);
-        fl2=this.checkInterval(num2,layerLeft);
-        if (fl1 && fl2) centrCube=22;
-        fl1=this.checkInterval(num1,layerRight);
-        fl2=this.checkInterval(num2,layerRight);
-        if (fl1 && fl2) centrCube=4;
-        fl1=this.checkInterval(num1,layerUp);
-        fl2=this.checkInterval(num2,layerUp);
-        if (fl1 && fl2) centrCube=16;
-        fl1=this.checkInterval(num1,layerDown);
-        fl2=this.checkInterval(num2,layerDown);
-        if (fl1 && fl2) centrCube=10;
+    this.findCenterCubeFor = function(secondCube) {
+        var centrCube = -1;
+        var num1 = selCube1.cubIndex;
+        var num2 = secondCube.cubIndex;
+        if (!num1 || num1 < 0)
+            return -1;
+        if (!num2 || num2 < 0)
+            return -1;
+
+        var fl1 = false, fl2 = false;
+        fl1 = this.checkInterval(num1, layerFront);
+        fl2 = this.checkInterval(num2, layerFront);
+        if (fl1 && fl2)
+            centrCube = 12;
+        fl1 = this.checkInterval(num1, layerBack);
+        fl2 = this.checkInterval(num2, layerBack);
+        if (fl1 && fl2)
+            centrCube = 14;
+        fl1 = this.checkInterval(num1, layerLeft);
+        fl2 = this.checkInterval(num2, layerLeft);
+        if (fl1 && fl2)
+            centrCube = 22;
+        fl1 = this.checkInterval(num1, layerRight);
+        fl2 = this.checkInterval(num2, layerRight);
+        if (fl1 && fl2)
+            centrCube = 4;
+        fl1 = this.checkInterval(num1, layerUp);
+        fl2 = this.checkInterval(num2, layerUp);
+        if (fl1 && fl2)
+            centrCube = 16;
+        fl1 = this.checkInterval(num1, layerDown);
+        fl2 = this.checkInterval(num2, layerDown);
+        if (fl1 && fl2)
+            centrCube = 10;
         return centrCube;
     };
-    
+
     this.pressSpace = function() {
-        if (demo.value === 0) {
+        if (demo.bMode === false) {
+            demo.bMode = true;
+            mainCube.bRotation = true;
             demo.value = 1;
-            this.selectStepOneCubes();
+            this.nextStep();
+//            this.selectStepOneCubes();
         }
     };
-    this.showAvailablePositions = function(){
-        var selCubePos=selCube1.position.clone();//.sub(mainCube.position);
-        
+    this.showAvailablePositions = function() {
+        var selCubePos = selCube1.position.clone();//.sub(mainCube.position);
+
         var numCube = UTILS.getIndex(selCubePos);
         if (numCube !== selCube1.cubIndex) {
             console.warn("cubic.showAvailablePositions: num cube error");
             return;
         }
         //проверки на попадание индекса в группу угловых или центральных кубиков
-        if (this.checkInterval(numCube,layerVertex) === true){
+        if (this.checkInterval(numCube, layerVertex) === true) {
             //выбран угловой
             this.markCubes(layerVertex);
         }
-        var lFace = this.checkIntervalX(numCube,layerX);
-        if ( lFace > -1){
+        var lFace = this.checkIntervalX(numCube, layerX);
+        if (lFace > -1) {
             //выбран центральный
             this.markCubes(layerX[1]);
         }
     };
-    
-    this.applyForAllCubes = function(fn){
-        for (var i in mainCube.children){
-            if (mainCube.children[i].name !== "cub") continue;
+
+    this.applyForAllCubes = function(fn) {
+        for (var i in mainCube.children) {
+            if (mainCube.children[i].name !== "cub")
+                continue;
             fn.call(this);
         }
     };
-    this.applyForCubesList = function(fn,cubesList){
-        for (var i in mainCube.children){
-            if (mainCube.children[i].name !== "cub") continue;
+    this.applyForCubesList = function(fn, cubesList) {
+        for (var i in mainCube.children) {
+            if (mainCube.children[i].name !== "cub")
+                continue;
             var numCub = mainCube.children[i].cubIndex;
-            var fl = this.checkInterval(numCub,cubesList);
-            if ( fl === true) {
-                fn.call(this,numCub);
+            var fl = this.checkInterval(numCub, cubesList);
+            if (fl === true) {
+                fn.call(this, numCub);
             }
         }
     };
-    this.getChildAtNumer = function(num){
-        if (!num) return null;
+    this.getChildAtNumer = function(num) {
+        if (!num)
+            return null;
         //добавить проверку на то, что аргумент - число
-        for(var i in mainCube.children){
-            if (mainCube.children[i].name !== "cub") continue;
-            if (mainCube.children[i].cubIndex === num) return mainCube.children[i];
+        for (var i in mainCube.children) {
+            if (mainCube.children[i].name !== "cub")
+                continue;
+            if (mainCube.children[i].cubIndex === num)
+                return mainCube.children[i];
         }
         return null;
     };
-    
-    this.markCubes = function(listCubes){
-        this.applyForCubesList(this.markCubeNum,listCubes);
+
+    this.markCubes = function(listCubes) {
+        this.applyForCubesList(this.markCubeNum, listCubes);
     };
-    this.markCubeNum = function(cub){
-        var cube =cub;
-        if (isNaN(cub) === true){
-            var a=0;
-        }else{
+    this.markCubeNum = function(cub) {
+        var cube = cub;
+        if (isNaN(cub) === true) {
+            var a = 0;
+        } else {
             //поиск кубика
             cube = this.getChildAtNumer(cub);
         }
-        if (cube === null) return;
-        this.setWireframeMateialToCube(cube,true);
+        if (cube === null)
+            return;
+        this.setWireframeMateialToCube(cube, true);
 //                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
 //                    INTERSECTED.material.emissive.setHex( 0xff0000 );
     };
-    this.findRotateCenter = function(dir){
-//        for (var i in cub.children){
-//            if (cub.children.geometry.faces[0].normal.equals(nullCube))
-//        }
-// отрефакторить базовые точки!
-//        var _dir=dir.clone().multiplyScalar(baseScalar);
-//        if (_dir.equals(basePointFront) === true) return basePointFront;
-//        if (_dir.equals(basePointBack) === true) return basePointBack;
-//        if (_dir.equals(basePointLeft) === true) return basePointLeft;
-//        if (_dir.equals(basePointRight) === true) return basePointRight;
-//        if (_dir.equals(basePointUp) === true) return basePointUp;
-//        if (_dir.equals(basePointDown) === true) return basePointDown;
-//        return null;
-        var arr=[];
-        var _dir=scene.localToWorld(dir.clone());//как по-нормальному сделать???
-        for(var i=0;i<basePoints.length;i++){
+    this.findRotateCenter = function(dir) {
+        var arr = [];
+        var _dir = scene.localToWorld(dir.clone());//как по-нормальному сделать???
+        for (var i = 0; i < basePoints.length; i++) {
             arr.push(basePoints[i].clone().multiplyScalar(baseScale).sub(_dir).length());
         }
-        var _min=Math.min.apply(null,arr);
-        var _ind=arr.indexOf(_min);
-        basePointCurrent=_ind;
-        var cubNum=this.findNearCenterCube();
+        var _min = Math.min.apply(null, arr);
+        var _ind = arr.indexOf(_min);
+        basePointCurrent = _ind;
+        var cubNum = this.findNearCenterCube();
         return cubNum;
     };
-    this.findNearCenterCube = function(){
+    this.findNearCenterCube = function() {
         var arr = [];
         var arrNum = [];
-        
-        var vPos=basePoints[basePointCurrent].clone().multiplyScalar(baseScale);
-        for(var i in mainCube.children){
-            if (mainCube.children[i].name !== "cub") continue;
-            if (this.checkInterval(mainCube.children[i].cubIndex,layerCenterCubes) === true){
+
+        var vPos = basePoints[basePointCurrent].clone().multiplyScalar(baseScale);
+        for (var i in mainCube.children) {
+            if (mainCube.children[i].name !== "cub")
+                continue;
+            if (this.checkInterval(mainCube.children[i].cubIndex, layerCenterCubes) === true) {
                 arrNum.push(mainCube.children[i].cubIndex);
-                var vCubePos=mainCube.children[i].position.clone();
-                vCubePos=scene.localToWorld(vCubePos);
+                var vCubePos = mainCube.children[i].position.clone();
+                vCubePos = scene.localToWorld(vCubePos);
                 arr.push(vCubePos.sub(vPos).length());
             }
         }
-        var _min=Math.min.apply(null,arr);
-        var _ind=arr.indexOf(_min);
-        var _num=arrNum[_ind];
+        var _min = Math.min.apply(null, arr);
+        var _ind = arr.indexOf(_min);
+        var _num = arrNum[_ind];
         return _num;
     };
-    this.computeScaleForCube = function(cub){
-        var sc=cub.position.clone();
+    this.computeScaleForCube = function(cub) {
+        var sc = cub.position.clone();
         UTILS.getIndexValue(sc);
-        if (sc.x === 0) sc.x=3;
-        if (sc.y === 0) sc.y=3;
-        if (sc.z === 0) sc.z=3;
+        if (sc.x === 0)
+            sc.x = 3;
+        if (sc.y === 0)
+            sc.y = 3;
+        if (sc.z === 0)
+            sc.z = 3;
         return sc;
     };
-    
-    this.setNullCubePosition = function(obj){
 
-        if (state === cSTATE.NONE){
+    this.setNullCubePosition = function(obj) {
 
-            nullCube.position.copy(obj.parent.position);
-            nullCube.cubIndex = obj.parent.cubIndex;
-            var dir=obj.geometry.faces[0].normal.clone();
-//            dir.applyMatrix4(obj.matrixWorld);//matrixWorld);//matrixRotationWorld
+        if (state === cSTATE.NONE) {
+//            nullCube.position.copy(obj.parent.position);
+//            nullCube.cubIndex = obj.parent.cubIndex;
+            var dir = obj.geometry.faces[0].normal.clone();
+            if (Math.abs(dir.x+dir.y+dir.z) !== 1){
+                return;//пропускаем фейсы под углом
+            }
             var rotMatrix = new THREE.Matrix4();
             rotMatrix.setRotationFromEuler(obj.parent.rotation);
             dir.applyMatrix4(rotMatrix);
-            nullCube.arrow.setDirection(dir);
-
-            var centerCubeNum=this.findRotateCenter(dir);
-            var cub=this.getChildAtNumer(centerCubeNum);
-            if (cub){
+//            nullCube.arrow.setDirection(dir);
+            var centerCubeNum = this.findRotateCenter(dir);
+            var cub = this.getChildAtNumer(centerCubeNum);
+            if (cub) {
                 nullFace.position.copy(cub.position);
-                nullFace.scale=this.computeScaleForCube(cub);
+                nullFace.scale = this.computeScaleForCube(cub);
             }
         }
-//        if (selMode === 1){//первый кубик выбран
-////            var delta=selCube1.position.clone().sub(obj.parent.position);
-//            var cntrCube=this.findCenterCubeFor(obj.parent);
-//            if (cntrCube < 0) return;
-//            var cCub=this.getChildAtNumer(cntrCube);
-//            
-////            cCub.scale=new THREE.Vector3(1.5,1.5,1.5);
-//            nullFace.position.copy(cCub.position);
-////            nullFace.rotation.copy(cCub.rotation);
-//            nullFace.scale.x=Math.abs(cCub.position.x)*3 || 1;
-//            nullFace.scale.y=Math.abs(cCub.position.y)*3 || 1;
-//            nullFace.scale.z=Math.abs(cCub.position.z)*3 || 1;
-//        }
     };
-    this.mouseMove = function(posX,posY){
-        if (state === cSTATE.NONE){
-            
-        }
-        if (state === cSTATE.ROTATE){
-            var deltaX=(mousePos.x-posX)/100.0;
-            var deltaY=(mousePos.y-posY)/100.0;
-            var angle=deltaX;
+    this.mouseMove = function(posX, posY) {
+        if (state === cSTATE.WAIT) return;
+
+        if (state === cSTATE.ROTATE) {
+            var deltaX = (mousePos.x - posX) / 100.0;
+            var deltaY = (mousePos.y - posY) / 100.0;
+            var angle = deltaX;
 //            if (Math.abs(deltaX)>Math.abs(deltaY)){
 //                angle=deltaX;//windowHalfX/deltaX;
 //            }else{
 //                angle=deltaY;//windowHalfY/deltaY;
 //            }
-            if (angle>Math.PI / 2.0) angle=Math.PI / 2.0;
-            if (angle<-Math.PI / 2.0) angle=-Math.PI / 2.0;
-            
+            if (angle > Math.PI / 2.0)
+                angle = Math.PI / 2.0;
+            if (angle < -Math.PI / 2.0)
+                angle = -Math.PI / 2.0;
+
             tarObj.rotAngle = angle;
         }
     };
-    
-    this.leftButtonUp = function(){
-        state = cSTATE.NONE;
-        var angle=tarObj.rotAngle;
-        if (angle>0){
-            tarObj.rotAngle=Math.PI / 2.0;
-        }else{
-            tarObj.rotAngle=-Math.PI / 2.0;
+
+    this.leftButtonUp = function() {
+        if (state !== cSTATE.ROTATE) return;
+        var angle = tarObj.rotAngle;
+        if (angle > 0) {
+            tarObj.rotAngle = Math.PI / 2.0;
+        } else {
+            tarObj.rotAngle = -Math.PI / 2.0;
         }
-        tarObj.step=angle/tarObj.rotAngle;
-//        var workObj = altObj.clone();
-//        var angle = tarObj.rotAngle * tarObj.step;
-//        UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
-//        tarObj.rotation.copy(workObj.rotation);
-//        tarObj.step += 0.1;
-//        mainCube.rot = 0;
-//        UTILS.normChildren(mainCube);
-//        tarObj.rotAngle =0;
-        newObj=altObj.clone();
+        tarObj.step = angle / tarObj.rotAngle;
+        newObj = altObj.clone();
         UTILS.rotateAroundWorldAxis(newObj, cntr, tarObj.rotAngle);
-        demo.value=0;
-        mainCube.rot=1;
+//        demo.value = 0;
+        mainCube.bRotation = true;
+        state = cSTATE.WAIT;
     };
-    this.leftButtonDown = function(posX,posY){
+    this.leftButtonDown = function(posX, posY) {
+        if (state === cSTATE.WAIT) return;
         state = cSTATE.ROTATE;
-        
-        mousePos.set(posX,posY);
+
+        mousePos.set(posX, posY);
         cntr = basePoints[basePointCurrent].clone();//new THREE.Vector3(0, 0, 1);
-        var vPos=basePoints[basePointCurrent].clone().multiplyScalar(baseScale);
+        var vPos = basePoints[basePointCurrent].clone().multiplyScalar(baseScale);
         this.move(vPos, true);
         tarObj.rotAngle = 0;
-        demo.value=99;
-//        t.
+        mainCube.bRotation = false;
+//        demo.value = 99;
     };
-//        if (selMode === 0){//первый кубик выбран
-//            selCube1=nullCube.clone();
-//            selCube1.cubIndex=nullCube.cubIndex;//????
-//            scene.add(selCube1);
-//            this.showAvailablePositions();
-//            selMode=1;
-//            return;
-//        }
-//        if (selMode === 1){//второй клик
-//            //проверить клик на этот же куб
-//            selCube2 = 0;
-//            selMode = 2;//включить режим поворота
-//            
-//            return;
-//        }
-//        box=box;
-//    };
+
     this.clearAllLayers = function() {
         var flag = false;
         for (var i in mainCube.children) {
@@ -492,7 +461,7 @@ CUBIC.init = function() {
             cub.remove(child);
         }
     };
-    this.setWireframeToMaterial = function(cub,matNum,flag) {//один конкретный материал в режим wireframe
+    this.setWireframeToMaterial = function(cub, matNum, flag) {//один конкретный материал в режим wireframe
         var name = this.getMaterialName(matNum);
         for (var ii in cub.children) {
             if (cub.children[ii].material.name === name) {
@@ -535,12 +504,18 @@ CUBIC.init = function() {
         return false;
     };
     this.checkIntervalX = function(num, intervalX) {
-        if (this.checkInterval(num,intervalX[0]) === true) return 0;
-        if (this.checkInterval(num,intervalX[1]) === true) return 1;
-        if (this.checkInterval(num,intervalX[2]) === true) return 2;
-        if (this.checkInterval(num,intervalX[3]) === true) return 3;
-        if (this.checkInterval(num,intervalX[4]) === true) return 4;
-        if (this.checkInterval(num,intervalX[5]) === true) return 5;
+        if (this.checkInterval(num, intervalX[0]) === true)
+            return 0;
+        if (this.checkInterval(num, intervalX[1]) === true)
+            return 1;
+        if (this.checkInterval(num, intervalX[2]) === true)
+            return 2;
+        if (this.checkInterval(num, intervalX[3]) === true)
+            return 3;
+        if (this.checkInterval(num, intervalX[4]) === true)
+            return 4;
+        if (this.checkInterval(num, intervalX[5]) === true)
+            return 5;
         return -1;
     };
     this.createModel = function(obj) {
@@ -548,7 +523,7 @@ CUBIC.init = function() {
         originCube = obj.clone();
         mainCube = obj.clone();
         mainCube.defaultChildren = obj.children.length;
-        mainCube.rot = 0;
+        mainCube.bRotation = false;
         UTILS.createCubik(mainCube, 1);
         UTILS.normChildren(mainCube);
         UTILS.numericCube(mainCube);
@@ -561,7 +536,7 @@ CUBIC.init = function() {
         mNameBack = this.getMaterialName(6);
         this.clearAllLayers();
     };
-    
+
     this.normCubeAxis = function(obj) {
         this.normRotateAxis(obj.rotation.x);
         this.normRotateAxis(obj.rotation.y);
@@ -595,47 +570,36 @@ CUBIC.init = function() {
         }
     };
     this.render = function() {
-        if (demo.value === 0) {
-            if (mainCube.rot !== 0) {
+//        if (demo.mode === 0) {
+            if (state === cSTATE.ROTATE){//поворот мышкой
+                var workObj = altObj.clone();
+                var angle = tarObj.rotAngle;
+                UTILS.rotateAroundWorldAxis(workObj, cntr, angle);
+                tarObj.rotation.copy(workObj.rotation);
+                return;
+            }
+            if (mainCube.bRotation !== false) {
                 var workObj = altObj.clone();
                 var angle = tarObj.rotAngle * tarObj.step;
-                UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
+                UTILS.rotateAroundWorldAxis(workObj, cntr, angle);
                 tarObj.rotation.copy(workObj.rotation);
                 tarObj.step += 0.1;
                 if (tarObj.step > 1) {
-                    mainCube.rot = 0;
                     tarObj.rotation.copy(newObj.rotation);
                     UTILS.normChildren(mainCube);
+                    if (demo.bMode === true){
+                        this.nextStep();
+                    }else{
+                        mainCube.bRotation = false;
+                        state = cSTATE.NONE;
+                    }
                 }
             }
-        } else {
-            if (demo.value === 99){
-                //поворот мышкой
-                    var workObj = altObj.clone();
-                    var angle = tarObj.rotAngle;
-                    UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
-                    tarObj.rotation.copy(workObj.rotation);
-                    return;
-            }
-            if (mainCube.rot !== 0) {
-                var workObj = altObj.clone();
-                var angle = tarObj.rotAngle * tarObj.step;
-                UTILS.rotateAroundWorldAxis(workObj, cntr, angle);// * (rotateYawСCW ? -1 : 1) );
-                tarObj.rotation.copy(workObj.rotation);
-                tarObj.step += 0.1;
-                if (tarObj.step > 1) {
-                    mainCube.rot = 0;
-                    UTILS.normChildren(mainCube);
-                }
-            } else {
-                this.nextStep();
-            }
-        }
     };
     this.nextStep = function() {
         if (demo.value > script1.length) {
-            demo.value = 0;
-            mainCube.rot = 0;
+            demo.bMode = false;
+            mainCube.bRotation = false;
         } else {
             var code = script1[demo.value - 1];
             this.processCode(code);
@@ -748,7 +712,7 @@ CUBIC.init = function() {
         newObj = mainCube.clone();
         tarObj.rotAngle = angl;
         tarObj.step = 0;
-        mainCube.rot = 1;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
+        mainCube.bRotation = true;//Math.PI/2.0 * (rotateYawСCW ? -1 : 1);
         cntr = mainCube.position.clone();
     };
     this.pressRotateLR = function(flag) {
@@ -766,7 +730,7 @@ CUBIC.init = function() {
     };
     this.move = function(basePoint, flag) {
         var angl = Math.PI / 2.0 * (flag < 0 ? -1 : 1);
-        mainCube.rot = 1;
+        mainCube.bRotation = true;
         var nearObj = UTILS.findNearCube(basePoint, mainCube);
         tarObj = nearObj;
         tarObj.rotAngle = angl;
@@ -778,40 +742,44 @@ CUBIC.init = function() {
         UTILS.rotateAroundWorldAxis(newObj, cntr, angl);
         UTILS.rebaseFront(mainCube, nearObj);
     };
-
+    this.pressMoves = function(ind,flag){
+        var vec=basePoints[ind].clone().multiplyScalar(baseScale);
+        this.move(vec, flag);
+    };
+    
     this.pressMoveFront = function(flag) {
         cntr = new THREE.Vector3(0, 0, 1);
-        this.move(basePointFront, flag);
+        this.pressMoves(0,flag);
     };
     this.pressMoveBack = function(flag) {
         cntr = new THREE.Vector3(0, 0, 1);
-        this.move(basePointBack, flag);
+        this.pressMoves(1,flag);
     };
     this.pressMoveRight = function(flag) {
         cntr = new THREE.Vector3(1, 0, 0);
-        this.move(basePointRight, flag);
+        this.pressMoves(2,flag);
     };
     this.pressMoveLeft = function(flag) {
         cntr = new THREE.Vector3(1, 0, 0);
-        this.move(basePointLeft, flag);
+        this.pressMoves(3,flag);
     };
     this.pressMoveUp = function(flag) {
         cntr = new THREE.Vector3(0, 1, 0);
-        this.move(basePointUp, flag);
+        this.pressMoves(5,flag);
     };
     this.pressMoveDown = function(flag) {
         cntr = new THREE.Vector3(0, 1, 0);
-        this.move(basePointDown, flag);
+        this.pressMoves(4,flag);
     };
-    this.getBoundingBox = function(obj){
+    this.getBoundingBox = function(obj) {
         var box = new THREE.Box3();//this.geometry.boundingBox.clone();
-        obj.traverse(function(child){
-             if (child instanceof THREE.Mesh) {
+        obj.traverse(function(child) {
+            if (child instanceof THREE.Mesh) {
                 child.geometry.computeBoundingBox();
                 var childbox = child.geometry.boundingBox.clone();
-                childbox.translate( child.localToWorld( new THREE.Vector3() ));
-                box.union( childbox );
-             }
+                childbox.translate(child.localToWorld(new THREE.Vector3()));
+                box.union(childbox);
+            }
         });
         return box;
     };
