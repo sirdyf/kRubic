@@ -338,10 +338,23 @@ CUBIC.init = function() {
         });
         console.log("find: " + controlPoints.length+" control points.");
         for (var i = 0; i < controlPoints.length; i++) {
-            arr[i] = controlPoints[i].position.clone().sub(camera.position).length();
+            var el=[];
+            el["num"] = i;
+            var pos=controlPoints[i].position.clone();
+            pos.sub(camera.position);
+            el["val"] = pos.length();
+            arr.push(el);
         }
-        arr.sort(function(a, b) { return a - b; });
+        arr.sort(function(a, b) { return a.val - b.val; });
         console.log(arr);
+        for (var i=0; i<arr.length;i++){
+            var n=arr[i].num;
+            if (i<3) {
+                controlPoints[n].scale.set(0.1,0.1,0.1);
+            }else{
+                controlPoints[n].scale.set(1,1,1);
+            }
+        }
 //        var _min = Math.min.apply(null, arr);
 //        var _ind = arr.indexOf(_min);
     };

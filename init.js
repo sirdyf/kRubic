@@ -140,26 +140,24 @@ function ray(){
     var intersects = raycaster.intersectObjects( child.children,true);//children );
 
     if ( intersects.length > 0 ) {
-
             if ( INTERSECTED != intersects[ 0 ].object ) {
-
-//                    if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
                     INTERSECTED = intersects[ 0 ].object;
-//                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-//                    INTERSECTED.material.emissive.setHex( 0xff0000 );
                     if (scene.main){
                         scene.main.setNullCubePosition(intersects[ 0 ].object);
                     }
             }
-
     } else {
-
-//            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
         scene.main.clearSelection();
-            INTERSECTED = null;
-
+        INTERSECTED = null;
     }
+    scene.traverse(function(child){
+        if (child.name === "controlPoint") {
+            intersects = raycaster.intersectObjects( child );
+            if ( intersects.length > 0 ) {
+                child.scale.set(2,2,2);
+            }
+        }
+     });
 };
 
 //var onKeyDownMain = function(event) {
