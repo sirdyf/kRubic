@@ -137,27 +137,33 @@ function ray(){
 
     var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
     var child = scene.main.getMainObj();
-    var intersects = raycaster.intersectObjects( child.children,true);//children );
+    var intersects = raycaster.intersectObjects( scene.children,true);//child.children,true);
 
     if ( intersects.length > 0 ) {
             if ( INTERSECTED != intersects[ 0 ].object ) {
                     INTERSECTED = intersects[ 0 ].object;
                     if (scene.main){
-                        scene.main.setNullCubePosition(intersects[ 0 ].object);
+                        if (INTERSECTED.parent.name === "cub"){
+                            scene.main.setNullCubePosition(intersects[ 0 ].object);
+                        }
+                        if (INTERSECTED.name === "controlPoint"){
+                            INTERSECTED.scale.set(2,2,2);
+                        }
+                        
                     }
             }
     } else {
         scene.main.clearSelection();
         INTERSECTED = null;
     }
-    scene.traverse(function(child){
-        if (child.name === "controlPoint") {
-            intersects = raycaster.intersectObjects( child );
-            if ( intersects.length > 0 ) {
-                child.scale.set(2,2,2);
-            }
-        }
-     });
+//    scene.traverse(function(child){
+//        if (child.name === "controlPoint") {
+//            intersects = raycaster.intersectObjects( child,false );
+//            if ( intersects.length > 0 ) {
+//                child.scale.set(2,2,2);
+//            }
+//        }
+//     });
 };
 
 //var onKeyDownMain = function(event) {
