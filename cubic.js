@@ -78,7 +78,7 @@ CUBIC.init = function() {
     //var script1 = ["D'","B","B","F","F","U","U","L","L","R","R","U'","L'","B'","F","D","U'","L'","R","F","F","D","D","U","U","F'"];//шахматы шестого порядка
     //var script1 = ["U'","L","L","U","F'","R","R","F","U'","L","L","U","F'","R","R","F"];//кубик в кубе
     //var script1 = ["U","U","F","F","R","R","U'","L","L","D","B","R'","B","R'","B","R'","D'","L","L","U'"];//куб в кубе
-    var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
+//    var script1 = ["F","U","U","D'","L'","U'","D","F","F","U","D'","L'","U'","D","U'","F'"];//цветок
     //var script1 = ["B","B","L","L","R","R","D","B","B","F","F","L","L","R","R","D","D","U'","F","F","L'","D","U'","B","F'","D","D","U","U","L","R'","U'"];//Глобус
 
     (this.creates = function() {
@@ -101,6 +101,7 @@ CUBIC.init = function() {
             point.position.copy(basePoints[i].clone().multiplyScalar(baseScale));
             if (i <3 ) point.scale.set(0.1,0.1,0.1);
             point.name = "controlPoint";
+            point.numIndex=i;
             scene.add(point);
         }
 
@@ -285,6 +286,24 @@ CUBIC.init = function() {
     this.clearSelection = function(){
         nullFace.position.set(0,0,0);
         nullFace.scale.set(1,1,1);
+        this.rightButtonUp();//восстанавливаем диаметры сфер, как после поворота п.к.м.
+//        scene.traverse(function(child){
+//            if (child.name === "controlPoint") {
+//                child.scale.set(2,2,2);
+//            }
+//         });
+    };
+    this.setNullCubePosBack = function(obj){
+        if (obj.name !== "controlPoint") return;
+        if (demo.bMode === true) return;
+        
+        basePointCurrent=obj.numIndex;
+        var centerCubeNum = this.findNearCenterCube();
+        var cub = this.getChildAtNumer(centerCubeNum);
+        if (cub) {
+            nullFace.position.copy(cub.position);
+            nullFace.scale = this.computeScaleForCube(cub);
+        }
     };
     
     this.setNullCubePosition = function(obj) {

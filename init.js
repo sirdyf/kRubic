@@ -147,7 +147,8 @@ function ray(){
                             scene.main.setNullCubePosition(intersects[ 0 ].object);
                         }
                         if (INTERSECTED.name === "controlPoint"){
-                            INTERSECTED.scale.set(2,2,2);
+//                            INTERSECTED.scale.set(2,2,2);
+                            scene.main.setNullCubePosBack(INTERSECTED);
                         }
                         
                     }
