@@ -315,10 +315,11 @@ CUBIC.init = function() {
             if (Math.abs(dir.x+dir.y+dir.z) !== 1){
                 return;//пропускаем фейсы под углом
             }
-            var rotMatrix = new THREE.Matrix4();
-            rotMatrix.setRotationFromEuler(obj.parent.rotation);
+            var rotMatrix = obj.parent.matrixWorld;//matrixRotationWorld.clone();//new THREE.Matrix4();
+//            rotMatrix.setRotationFromEuler(obj.parent.rotation);
             dir.applyMatrix4(rotMatrix);
 //            nullCube.arrow.setDirection(dir);
+
             var centerCubeNum = this.findRotateCenter(dir);
             var cub = this.getChildAtNumer(centerCubeNum);
             if (cub) {

@@ -137,12 +137,12 @@ THREE.PointerLockControls = function(camera) {
         }
   
         if (moveRight || moveLeft){
-            scene.main.pressMoveFront(moveRight ? 1 : -1);
+//            scene.main.pressMoveFront(moveRight ? 1 : -1);
             moveRight=false;
             moveLeft=false;
         };
         if (moveForward || moveBackward){
-            scene.main.pressMoveRight(moveForward ? 1 : -1);
+//            scene.main.pressMoveRight(moveForward ? 1 : -1);
                 moveForward=false;
                 moveBackward=false;
         };
