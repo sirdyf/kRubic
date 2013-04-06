@@ -73,6 +73,8 @@ function init() {
         scene.main.createModel(object);
         scene.add(scene.main.getMainObj());
         scene.tstBox=scene.main.getBoundingBox(object);
+        
+        scene.main.createTargetCube();
     });
     loader.load('model/props.obj', 'model/props.mtl');
 

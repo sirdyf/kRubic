@@ -3,13 +3,16 @@
  */
 var CUBIC = CUBIC || {revision: "v0.1.7"};
  
+// THREE.Object3D.prototype.cubIndex = 10;
+ 
 CUBIC.init = function() {
     var cSTATE = {NONE: -1, ROTATE: 0, WAIT: 1};
     var state = cSTATE.NONE;
     var mousePos = new THREE.Vector3();
     
-    var originCube = new THREE.Object3D();
+    var originCube = new THREE.Object3D();// 1 из 26 кубиков
     var mainCube = new THREE.Object3D();
+    var targetCube = new THREE.Object3D();//текущая цель сборки
     
     var newObj = 0;
     var altObj = 0;
@@ -104,9 +107,29 @@ CUBIC.init = function() {
             point.numIndex=i;
             scene.add(point);
         }
-
     })();
 
+    this.createTargetCube = function(){
+        targetCube = mainCube.clone();
+//        _.extend(targetCube,mainCube);
+        targetCube.name = "targetCube";
+        for (var i=0;i<targetCube.children.length;i++){
+            if (mainCube.children[i].cubIndex){
+                targetCube.children[i].cubIndex=mainCube.children[i].cubIndex;
+            }
+        }
+//        var pi_3 = Math.PI/8.0;
+        targetCube.rotation.set(-0.1,Math.PI,0);
+        targetCube.position.copy(new THREE.Vector3(-7,3,-20));
+//        targetCube.traverse(function(child){
+//            if (child.name === "cub") {
+//                child.name = "tarCub";
+//            }
+//        });
+        camera.add(targetCube);
+//        scene.add(targetCube);
+    };
+    
     this.computeFrontLayer = function() {
         var frontPosition = new THREE.Vector3(0, 0, -1);
         var frontIndex = UTILS.getIndex(frontPosition);
@@ -119,72 +142,73 @@ CUBIC.init = function() {
         this.computeFrontLayer();
     };
     
-    this.findCenterCubeFor = function(secondCube) {
-        var centrCube = -1;
-        var num1 = selCube1.cubIndex;
-        var num2 = secondCube.cubIndex;
-        if (!num1 || num1 < 0)
-            return -1;
-        if (!num2 || num2 < 0)
-            return -1;
-
-        var fl1 = false, fl2 = false;
-        fl1 = this.checkInterval(num1, layerFront);
-        fl2 = this.checkInterval(num2, layerFront);
-        if (fl1 && fl2)
-            centrCube = 12;
-        fl1 = this.checkInterval(num1, layerBack);
-        fl2 = this.checkInterval(num2, layerBack);
-        if (fl1 && fl2)
-            centrCube = 14;
-        fl1 = this.checkInterval(num1, layerLeft);
-        fl2 = this.checkInterval(num2, layerLeft);
-        if (fl1 && fl2)
-            centrCube = 22;
-        fl1 = this.checkInterval(num1, layerRight);
-        fl2 = this.checkInterval(num2, layerRight);
-        if (fl1 && fl2)
-            centrCube = 4;
-        fl1 = this.checkInterval(num1, layerUp);
-        fl2 = this.checkInterval(num2, layerUp);
-        if (fl1 && fl2)
-            centrCube = 16;
-        fl1 = this.checkInterval(num1, layerDown);
-        fl2 = this.checkInterval(num2, layerDown);
-        if (fl1 && fl2)
-            centrCube = 10;
-        return centrCube;
-    };
+//    this.findCenterCubeFor = function(secondCube) {
+//        var centrCube = -1;
+//        var num1 = selCube1.cubIndex;
+//        var num2 = secondCube.cubIndex;
+//        if (!num1 || num1 < 0)
+//            return -1;
+//        if (!num2 || num2 < 0)
+//            return -1;
+//
+//        var fl1 = false, fl2 = false;
+//        fl1 = this.checkInterval(num1, layerFront);
+//        fl2 = this.checkInterval(num2, layerFront);
+//        if (fl1 && fl2)
+//            centrCube = 12;
+//        fl1 = this.checkInterval(num1, layerBack);
+//        fl2 = this.checkInterval(num2, layerBack);
+//        if (fl1 && fl2)
+//            centrCube = 14;
+//        fl1 = this.checkInterval(num1, layerLeft);
+//        fl2 = this.checkInterval(num2, layerLeft);
+//        if (fl1 && fl2)
+//            centrCube = 22;
+//        fl1 = this.checkInterval(num1, layerRight);
+//        fl2 = this.checkInterval(num2, layerRight);
+//        if (fl1 && fl2)
+//            centrCube = 4;
+//        fl1 = this.checkInterval(num1, layerUp);
+//        fl2 = this.checkInterval(num2, layerUp);
+//        if (fl1 && fl2)
+//            centrCube = 16;
+//        fl1 = this.checkInterval(num1, layerDown);
+//        fl2 = this.checkInterval(num2, layerDown);
+//        if (fl1 && fl2)
+//            centrCube = 10;
+//        return centrCube;
+//    };
 
     this.pressSpace = function() {
         if (demo.bMode === false) {
             demo.bMode = true;
             mainCube.bRotation = true;
             demo.value = 1;
-//            this.selectStepOneCubes();
+            this.selectStepOneCubes(mainCube);
+            this.selectStepOneCubes(targetCube);
             this.nextStep();
         }
     };
     
-    this.showAvailablePositions = function() {
-        var selCubePos = selCube1.position.clone();//.sub(mainCube.position);
-
-        var numCube = UTILS.getIndex(selCubePos);
-        if (numCube !== selCube1.cubIndex) {
-            console.warn("cubic.showAvailablePositions: num cube error");
-            return;
-        }
-        //проверки на попадание индекса в группу угловых или центральных кубиков
-        if (this.checkInterval(numCube, layerVertex) === true) {
-            //выбран угловой
-            this.markCubes(layerVertex);
-        }
-        var lFace = this.checkIntervalX(numCube, layerX);
-        if (lFace > -1) {
-            //выбран центральный
-            this.markCubes(layerX[1]);
-        }
-    };
+//    this.showAvailablePositions = function() {
+//        var selCubePos = selCube1.position.clone();//.sub(mainCube.position);
+//
+//        var numCube = UTILS.getIndex(selCubePos);
+//        if (numCube !== selCube1.cubIndex) {
+//            console.warn("cubic.showAvailablePositions: num cube error");
+//            return;
+//        }
+//        //проверки на попадание индекса в группу угловых или центральных кубиков
+//        if (this.checkInterval(numCube, layerVertex) === true) {
+//            //выбран угловой
+//            this.markCubes(layerVertex);
+//        }
+//        var lFace = this.checkIntervalX(numCube, layerX);
+//        if (lFace > -1) {
+//            //выбран центральный
+//            this.markCubes(layerX[1]);
+//        }
+//    };
 
     this.applyForAllCubes = function(fn) {
         for (var i in mainCube.children) {
@@ -356,7 +380,7 @@ CUBIC.init = function() {
         scene.traverse(function(child){
            if (child.name === "controlPoint") controlPoints.push(child);
         });
-        console.log("find: " + controlPoints.length+" control points.");
+//        console.log("find: " + controlPoints.length+" control points.");
         for (var i = 0; i < controlPoints.length; i++) {
             var el=[];
             el["num"] = i;
@@ -366,7 +390,7 @@ CUBIC.init = function() {
             arr.push(el);
         }
         arr.sort(function(a, b) { return a.val - b.val; });
-        console.log(arr);
+//        console.log(arr);
         for (var i=0; i<arr.length;i++){
             var n=arr[i].num;
             if (i<3) {
@@ -542,14 +566,16 @@ CUBIC.init = function() {
         }
     };
 
-    this.selectStepOneCubes = function() {
-        for (var i in mainCube.children) {
-            if (mainCube.children[i].name !== "cub")
+    this.selectStepOneCubes = function(obj) {
+        var name=0;
+        for (var i in obj.children) {
+            name = obj.children[i].name;
+            if ((name !== "cub") && (name !== "tarCub"))
                 continue;
-            var ind = mainCube.children[i].cubIndex;
+            var ind = obj.children[i].cubIndex;
             var flag = this.checkInterval(ind, oneStepNumbers);
             if (flag === false) {
-                this.setWireframeMateialToCube(mainCube.children[i]);
+                this.setWireframeMateialToCube(obj.children[i]);
             }
         }
     };
@@ -582,11 +608,13 @@ CUBIC.init = function() {
     this.createModel = function(obj) {
         this.getMaterialFromObj(obj);
         originCube = obj.clone();
+//        originCube.cubIndex=0;
         mainCube = obj.clone();
+        mainCube.cubIndex=0;
         mainCube.defaultChildren = obj.children.length;
         mainCube.bRotation = false;
         UTILS.createCubik(mainCube, 1);
-        UTILS.normChildren(mainCube);
+//        UTILS.normChildren(mainCube);
         UTILS.numericCube(mainCube);
 
         mNameRight = this.getMaterialName(1);

@@ -3,6 +3,7 @@ var UTILS = UTILS || {REVISION: '0.1'};
 UTILS.numericCube = function(base) {
     for (var i in base.children) {
         var obj = base.children[i];
+        if (obj.name !== "cub") continue;
         var pos = obj.position.clone();
         
         obj.cubIndex = this.getIndex(pos);//obj.z + 1 + (obj.y + 1) * 3 + (obj.x + 1) * 9;
