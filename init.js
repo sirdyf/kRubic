@@ -148,6 +148,9 @@ function ray(){
                         if (INTERSECTED.parent.name === "cub"){
                             scene.main.setNullCubePosition(intersects[ 0 ].object);
                         }
+                        if (INTERSECTED.parent.name === "tarCub"){
+                            scene.main.setTargetCubePosition(intersects[ 0 ].object);
+                        }
                         if (INTERSECTED.name === "controlPoint"){
 //                            INTERSECTED.scale.set(2,2,2);
                             scene.main.setNullCubePosBack(INTERSECTED);

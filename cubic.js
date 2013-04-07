@@ -96,7 +96,7 @@ CUBIC.init = function() {
         nullCube.arrow = objectArrow;
         nullCube.add(objectArrow);
         nullCube.add(objectAxis);
-//        scene.add(nullCube);
+        scene.add(nullCube);
         scene.add(nullFace);
         
         for(var i=0;i<6;i++){
@@ -114,8 +114,9 @@ CUBIC.init = function() {
 //        _.extend(targetCube,mainCube);
         targetCube.name = "targetCube";
         for (var i=0;i<targetCube.children.length;i++){
-            if (mainCube.children[i].cubIndex){
+            if (mainCube.children[i].name === "cub"){
                 targetCube.children[i].cubIndex=mainCube.children[i].cubIndex;
+                targetCube.children[i].name = "tarCub";
             }
         }
 //        var pi_3 = Math.PI/8.0;
@@ -329,12 +330,22 @@ CUBIC.init = function() {
             nullFace.scale = this.computeScaleForCube(cub);
         }
     };
+    this.setTargetCubePosition = function(obj){
+        var numCube=obj.parent.cubIndex;
+        var mObj=0;
+        mainCube.traverse(function(child){
+            if (child.cubIndex === numCube){
+                mObj=child;
+            }
+        });
+        if (mObj  === 0) return;
+        nullCube.position.copy(mObj.position);
+//        nullCube.cubIndex = mObj.cubIndex;
+    };
     
     this.setNullCubePosition = function(obj) {
 
         if (state === cSTATE.NONE) {
-//            nullCube.position.copy(obj.parent.position);
-//            nullCube.cubIndex = obj.parent.cubIndex;
             var dir = obj.geometry.faces[0].normal.clone();
             if (Math.abs(dir.x+dir.y+dir.z) !== 1){
                 return;//пропускаем фейсы под углом
